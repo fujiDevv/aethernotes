@@ -81,7 +81,8 @@
 
       <!-- Strikethrough -->
       <button :class="['menu-btn', { 'is-active': editor.isActive('strike') }]"
-        @click="deleteSlashThen(() => editor!.chain().focus().toggleStrike().run())" title="Strikethrough (Cmd+Shift+X)">
+        @click="deleteSlashThen(() => editor!.chain().focus().toggleStrike().run())"
+        title="Strikethrough (Cmd+Shift+X)">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M16 4H9a3 3 0 0 0-2.83 4 4 4 0 0 0 3.71 3h7.24a4 4 0 0 1 3.71 3 3 3 0 0 1-2.83 4H7" />
@@ -133,7 +134,8 @@
       </button>
 
       <!-- Link Toggle — only shown when text is selected, not in slash mode -->
-      <button v-if="!isSlashMode" type="button" :class="['menu-btn', { 'is-active': editor.isActive('link') || showLinkInput }]"
+      <button v-if="!isSlashMode" type="button"
+        :class="['menu-btn', { 'is-active': editor.isActive('link') || showLinkInput }]"
         @mousedown.prevent.stop="toggleLink" title="Add Link">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -150,7 +152,6 @@ import { ref, computed } from 'vue';
 import { type Editor } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
 import EmojiPicker from 'vue3-emoji-picker';
-import 'vue3-emoji-picker/css';
 import { useSettingsStore } from '@/stores/settings';
 
 const props = defineProps<{
@@ -435,6 +436,8 @@ function cancelLink() {
 </script>
 
 <style scoped>
+@import '../../../node_modules/vue3-emoji-picker/dist/style.css';
+
 .bubble-menu-wrapper {
   display: flex;
   flex-direction: column;
@@ -598,10 +601,11 @@ function cancelLink() {
   --v3-picker-input-border: var(--border);
   --v3-picker-input-focus-border: var(--accent);
   --v3-picker-emoji-hover: var(--hover-bg);
-  
+
   box-shadow: none;
   border: none;
 }
+
 :deep(.v3-emoji-picker.v3-color-theme-dark) {
   --v3-group-image-filter: invert(1);
 }

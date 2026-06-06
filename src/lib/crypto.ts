@@ -2,7 +2,7 @@
  * Generates a cryptographically random 16-byte salt.
  */
 export function generateSalt(): Uint8Array<ArrayBuffer> {
-  return window.crypto.getRandomValues(new Uint8Array(16)) as Uint8Array<ArrayBuffer>;
+  return globalThis.crypto.getRandomValues(new Uint8Array(16)) as Uint8Array<ArrayBuffer>;
 }
 
 /**
@@ -32,7 +32,7 @@ export function hexToBuf(hexString: string): Uint8Array<ArrayBuffer> {
  */
 export async function deriveKey(passphrase: string, salt: Uint8Array<ArrayBuffer>): Promise<CryptoKey> {
   const enc = new TextEncoder();
-  const keyMaterial = await window.crypto.subtle.importKey(
+  const keyMaterial = await globalThis.crypto.subtle.importKey(
     'raw',
     enc.encode(passphrase),
     { name: 'PBKDF2' },
@@ -40,7 +40,7 @@ export async function deriveKey(passphrase: string, salt: Uint8Array<ArrayBuffer
     ['deriveBits', 'deriveKey']
   );
 
-  return window.crypto.subtle.deriveKey(
+  return globalThis.crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
       salt: salt,
@@ -59,9 +59,9 @@ export async function deriveKey(passphrase: string, salt: Uint8Array<ArrayBuffer
  */
 export async function encryptText(text: string, key: CryptoKey): Promise<{ ciphertext: string; iv: string }> {
   const enc = new TextEncoder();
-  const iv = window.crypto.getRandomValues(new Uint8Array(12)) as Uint8Array<ArrayBuffer>; // 12-byte IV for GCM
+  const iv = globalThis.crypto.getRandomValues(new Uint8Array(12)) as Uint8Array<ArrayBuffer>; // 12-byte IV for GCM
 
-  const ciphertextBuffer = await window.crypto.subtle.encrypt(
+  const ciphertextBuffer = await globalThis.crypto.subtle.encrypt(
     { name: 'AES-GCM', iv },
     key,
     enc.encode(text)
@@ -81,7 +81,7 @@ export async function decryptText(ciphertextHex: string, ivHex: string, key: Cry
   const ciphertext = hexToBuf(ciphertextHex);
   const iv = hexToBuf(ivHex);
 
-  const decryptedBuffer = await window.crypto.subtle.decrypt(
+  const decryptedBuffer = await globalThis.crypto.subtle.decrypt(
     { name: 'AES-GCM', iv },
     key,
     ciphertext

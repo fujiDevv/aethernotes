@@ -4,8 +4,8 @@ import vue from '@vitejs/plugin-vue';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
-export default defineConfig({
-  plugins: [
+export default defineConfig(({ command }) => {
+  const plugins = [
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
@@ -30,24 +30,43 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
       },
     }),
-  ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
-  test: {
-    environment: 'happy-dom',
-    globals: true,
-  },
-  build: {
-    chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      onwarn(warning, warn) {
-        if (warning.code === 'INVALID_ANNOTATION') return;
-        warn(warning);
+  ];
+
+  if (command === "build") {
+    plugins.push({
+      name: "force-exit",
+      closeBundle() {
+        const bun = (globalThis as any).Bun;
+        if (bun) {
+          bun.exit(0);
+        } else {
+          process.exit(0);
+        }
+      },
+    });
+  }
+
+  return {
+    plugins,
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
       },
     },
-  },
+    test: {
+      environment: 'happy-dom',
+      globals: true,
+      threads: false,
+    },
+    build: {
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        onwarn(warning, warn) {
+          if (warning.code === 'INVALID_ANNOTATION') return;
+          warn(warning);
+        },
+      },
+    },
+  };
 });
 
