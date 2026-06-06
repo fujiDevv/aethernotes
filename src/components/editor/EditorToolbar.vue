@@ -435,8 +435,11 @@ function cancelLink() {
 }
 </script>
 
-<style scoped>
+<style>
 @import '../../../node_modules/vue3-emoji-picker/dist/style.css';
+</style>
+
+<style scoped>
 
 .bubble-menu-wrapper {
   display: flex;
