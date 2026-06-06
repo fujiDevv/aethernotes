@@ -1,6 +1,11 @@
 <template>
   <BubbleMenu v-if="editor" :editor="editor" :tippy-options="{ duration: 150, interactive: true, placement: 'top' }"
     :should-show="shouldShowMenu" class="bubble-menu-wrapper font-ui" @click.stop @mousedown.stop>
+    <!-- Emoji Picker Popover (Above the toolbar) -->
+    <div v-show="showEmojiPicker" class="emoji-popover-container" @click.stop @mousedown.stop>
+      <EmojiPicker :theme="currentTheme" @select="handleEmojiSelect" />
+    </div>
+
     <!-- Color Popover (Above the toolbar) -->
     <div v-show="showColorMenu" class="color-popover" @click.stop @mousedown.stop>
       <div class="color-options-title font-ui">Text Color</div>
@@ -115,6 +120,18 @@
         </svg>
       </button>
 
+      <!-- Emoji Picker Button -->
+      <button type="button" :class="['menu-btn', { 'is-active': showEmojiPicker }]"
+        @mousedown.prevent.stop="toggleEmojiPicker" title="Insert Emoji">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+          <line x1="9" y1="9" x2="9.01" y2="9" />
+          <line x1="15" y1="9" x2="15.01" y2="9" />
+        </svg>
+      </button>
+
       <!-- Link Toggle — only shown when text is selected, not in slash mode -->
       <button v-if="!isSlashMode" type="button" :class="['menu-btn', { 'is-active': editor.isActive('link') || showLinkInput }]"
         @mousedown.prevent.stop="toggleLink" title="Add Link">
@@ -132,16 +149,22 @@
 import { ref, computed } from 'vue';
 import { type Editor } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
+import EmojiPicker from 'vue3-emoji-picker';
+import 'vue3-emoji-picker/css';
+import { useSettingsStore } from '@/stores/settings';
 
 const props = defineProps<{
   editor: Editor | null | undefined;
 }>();
+
+const settingsStore = useSettingsStore();
 
 const showLinkInput = ref(false);
 const linkUrl = ref('');
 const linkInputRef = ref<HTMLInputElement | null>(null);
 const savedRange = ref<{ from: number; to: number } | null>(null);
 const showColorMenu = ref(false);
+const showEmojiPicker = ref(false);
 
 const labelColors = [
   { name: 'Default', hex: null },
@@ -161,8 +184,16 @@ const currentColor = computed(() => {
   return props.editor.getAttributes('textStyle').color || null;
 });
 
+const currentTheme = computed(() => {
+  if (settingsStore.theme === 'system') {
+    const isDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return isDark ? 'dark' : 'light';
+  }
+  return settingsStore.theme;
+});
+
 /**
- * True when the bubble menu is open because the user typed '/' (no text selected).
+ * True when the bubble menu is open because the user typed '/' followed by search text.
  * False when triggered by text selection or double-click.
  * Used to hide the link button in slash-command mode.
  */
@@ -172,7 +203,7 @@ const isSlashMode = computed(() => {
   if (!selection.empty) return false; // text is selected → not slash mode
   const { $from } = selection;
   const textBeforeCursor = $from.parent.textContent.slice(0, $from.parentOffset);
-  return textBeforeCursor.endsWith('/');
+  return /\/\w*$/.test(textBeforeCursor);
 });
 
 function toggleColorMenu() {
@@ -180,7 +211,17 @@ function toggleColorMenu() {
     showLinkInput.value = false;
     props.editor?.view.dom.classList.remove('hide-selection');
   }
+  showEmojiPicker.value = false;
   showColorMenu.value = !showColorMenu.value;
+}
+
+function toggleEmojiPicker() {
+  if (showLinkInput.value) {
+    showLinkInput.value = false;
+    props.editor?.view.dom.classList.remove('hide-selection');
+  }
+  showColorMenu.value = false;
+  showEmojiPicker.value = !showEmojiPicker.value;
 }
 
 function applyColor(color: string | null) {
@@ -195,7 +236,7 @@ function applyColor(color: string | null) {
 }
 
 /**
- * Checks if the bubble menu was triggered by a trailing '/' and deletes it,
+ * Checks if the bubble menu was triggered by a trailing slash command and deletes it,
  * then runs the given callback. Safe to call from any button action.
  */
 function deleteSlashIfPresent(): boolean {
@@ -203,9 +244,11 @@ function deleteSlashIfPresent(): boolean {
   const { selection } = props.editor.state;
   const { $from } = selection;
   const textBeforeCursor = $from.parent.textContent.slice(0, $from.parentOffset);
-  if (textBeforeCursor.endsWith('/')) {
+  const match = textBeforeCursor.match(/\/(\w*)$/);
+  if (match) {
     const pos = selection.from;
-    props.editor.chain().focus().deleteRange({ from: pos - 1, to: pos }).run();
+    const commandLength = match[0].length;
+    props.editor.chain().focus().deleteRange({ from: pos - commandLength, to: pos }).run();
     return true;
   }
   return false;
@@ -214,6 +257,19 @@ function deleteSlashIfPresent(): boolean {
 function deleteSlashThen(action: () => void) {
   deleteSlashIfPresent();
   action();
+}
+
+function handleEmojiSelect(emoji: any) {
+  if (emoji && emoji.i) {
+    insertEmoji(emoji.i);
+  }
+}
+
+function insertEmoji(char: string) {
+  if (!props.editor) return;
+  deleteSlashIfPresent();
+  props.editor.chain().focus().insertContent(char).run();
+  showEmojiPicker.value = false;
 }
 
 const shouldShowMenu = ({ state, editor }: { state: any; editor: any }) => {
@@ -243,13 +299,18 @@ const shouldShowMenu = ({ state, editor }: { state: any; editor: any }) => {
     return true;
   }
 
+  // If the emoji picker is open, keep the bubble menu visible
+  if (showEmojiPicker.value) {
+    return true;
+  }
+
   const show = (() => {
     // 1. If text is highlighted, show bubble menu
     if (!empty) {
       return true;
     }
 
-    // 2. If selection is empty, show bubble menu only if text immediately before cursor ends with '/'
+    // 2. If selection is empty, show bubble menu only if text immediately before cursor ends with '/' (or slash commands)
     // and we are NOT on the first block (first child of the document)
     const isFirstBlock = $from.depth >= 1 && $from.start(1) === 1;
     if (isFirstBlock) {
@@ -260,12 +321,13 @@ const shouldShowMenu = ({ state, editor }: { state: any; editor: any }) => {
     const cursorPosInBlock = $from.parentOffset;
     const textBeforeCursor = currentBlockText.slice(0, cursorPosInBlock);
 
-    return textBeforeCursor.endsWith('/');
+    return /\/\w*$/.test(textBeforeCursor);
   })();
 
   if (!show) {
     showLinkInput.value = false;
     showColorMenu.value = false;
+    showEmojiPicker.value = false;
   }
   return show;
 };
@@ -281,10 +343,12 @@ function formatBlock(type: 'paragraph' | 'h1' | 'h2' | 'h3') {
 
   let chain = props.editor.chain().focus();
 
-  // If the text before cursor ends with '/', delete the '/' character
-  if (textBeforeCursor.endsWith('/')) {
+  // If the text before cursor ends with '/' or a slash command, delete it
+  const match = textBeforeCursor.match(/\/(\w*)$/);
+  if (match) {
     const pos = selection.from;
-    chain = chain.deleteRange({ from: pos - 1, to: pos });
+    const commandLength = match[0].length;
+    chain = chain.deleteRange({ from: pos - commandLength, to: pos });
   }
 
   if (type === 'paragraph') {
@@ -306,6 +370,9 @@ function toggleLink() {
     props.editor.view.dom.classList.remove('hide-selection');
     return;
   }
+
+  showEmojiPicker.value = false;
+  showColorMenu.value = false;
 
   // Delete '/' if present before saving the selection
   deleteSlashIfPresent();
@@ -511,5 +578,31 @@ function cancelLink() {
 .link-cancel-btn:hover {
   background: var(--bg-sunken);
   color: var(--notion-red);
+}
+
+.emoji-popover-container {
+  display: flex;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  z-index: 100;
+}
+
+:deep(.v3-emoji-picker) {
+  --v3-picker-bg: var(--bg-elevated);
+  --v3-picker-fg: var(--text-primary);
+  --v3-picker-border: var(--border-subtle);
+  --v3-picker-input-bg: var(--bg-sunken);
+  --v3-picker-input-border: var(--border);
+  --v3-picker-input-focus-border: var(--accent);
+  --v3-picker-emoji-hover: var(--hover-bg);
+  
+  box-shadow: none;
+  border: none;
+}
+:deep(.v3-emoji-picker.v3-color-theme-dark) {
+  --v3-group-image-filter: invert(1);
 }
 </style>

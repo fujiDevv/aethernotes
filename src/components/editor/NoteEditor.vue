@@ -148,7 +148,7 @@ const isLocked = computed(() => {
 
 
 
-// Setup Editor
+// Setup Editor (handles placeholder, slash commands, and toolbar integrations)
 const editor = useEditor({
   content: '',
   extensions: [
