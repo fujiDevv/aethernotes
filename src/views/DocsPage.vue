@@ -289,6 +289,14 @@ onMounted(() => {
     { rootMargin: '-20% 0px -70% 0px', threshold: 0 }
   );
   sections.forEach((s) => observer!.observe(s));
+
+  // Scroll to hash if present in URL
+  if (window.location.hash) {
+    const hash = window.location.hash.slice(1);
+    setTimeout(() => {
+      scrollTo(hash);
+    }, 100);
+  }
 });
 
 onUnmounted(() => {
