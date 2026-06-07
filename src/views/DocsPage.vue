@@ -172,6 +172,7 @@
             <li><strong>PBKDF2 Derivation:</strong> Key derived using PBKDF2 (100,000 iterations) with a local random salt.</li>
             <li><strong>AES-256-GCM:</strong> Derived key encrypts/decrypts notes in-memory. The key never touches IndexedDB or localStorage.</li>
             <li><strong>IndexedDB Storage:</strong> Encrypted ciphertext, random IV, and authentication tag are stored locally.</li>
+            <li><strong>Cryptographic Resilience:</strong> In case of decryption failures due to missing or mismatched salts, the application safely intercepts the failure and redirects the user to an isolated Recovery Screen, avoiding top-level crashes and allowing settings reset.</li>
           </ul>
         </section>
 
@@ -185,6 +186,7 @@
             <li><strong>Desktop (Chrome/Edge/Safari):</strong> Click the install icon in the address bar.</li>
             <li><strong>iOS Safari:</strong> Tap Share → Add to Home Screen.</li>
             <li><strong>Android Chrome:</strong> Tap the install banner.</li>
+            <li><strong>Offline Font Caching:</strong> Critical font distributions are pre-cached by the service worker to guarantee immediate layout stability and avoid jarring font swapping when starting entirely offline.</li>
           </ul>
         </section>
 
@@ -197,6 +199,7 @@
           <ul class="doc-list">
             <li><strong>Export Vault (JSON):</strong> Full encrypted database snapshot file including settings and note history.</li>
             <li><strong>Export Markdown (ZIP):</strong> Generates a folder structure containing all notes exported as raw Markdown (.md) text files inside a ZIP archive.</li>
+            <li><strong>Optimistic Concurrency Control:</strong> To protect against accidental overwrites across multiple sessions or tabs, Aether Notes uses optimistic locking. If a timestamp mismatch is detected, edits are frozen and a resolution banner lets you choose between keeping local edits or syncing from the database.</li>
           </ul>
         </section>
 
