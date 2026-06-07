@@ -16,6 +16,7 @@
         <div class="header-right">
           <nav class="nav-links">
             <router-link to="/docs">Docs</router-link>
+            <a :href="downloadUrl">Download</a>
             <a href="https://github.com/joshuasarmiento/aethernotes" target="_blank" rel="noopener">GitHub</a>
             <router-link to="/note" class="cta-btn">Launch App →</router-link>
           </nav>
@@ -46,6 +47,7 @@
           <router-link to="/docs#editor" @click="mobileMenuOpen = false">Features</router-link>
           <router-link to="/docs#security" @click="mobileMenuOpen = false">Security</router-link>
           <router-link to="/docs" @click="mobileMenuOpen = false">Docs</router-link>
+          <a :href="downloadUrl" @click="mobileMenuOpen = false">Download App</a>
           <a href="https://github.com/joshuasarmiento/aethernotes" target="_blank" rel="noopener"
             @click="mobileMenuOpen = false">GitHub</a>
           <router-link to="/note" class="mobile-cta-btn" @click="mobileMenuOpen = false">Launch App →</router-link>
@@ -66,8 +68,23 @@
           client-side with no accounts, no trackers, and complete offline capability.
         </p>
         <div class="hero-ctas font-ui">
-          <router-link to="/note" class="hero-btn primary">Launch Editor →</router-link>
+          <router-link to="/note" class="hero-btn primary">Launch Web App →</router-link>
+          <a :href="downloadUrl" class="hero-btn download-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" x2="12" y1="15" y2="3"/>
+            </svg>
+            Download for {{ osName || 'Desktop' }}
+          </a>
           <router-link to="/docs" class="hero-btn secondary">Documentation</router-link>
+        </div>
+        <div class="platform-downloads font-ui">
+          <span>Other platforms: </span>
+          <a href="https://github.com/joshuasarmiento/aethernotes/releases/latest/download/Aether-Notes_aarch64.dmg">macOS (Apple Silicon)</a> · 
+          <a href="https://github.com/joshuasarmiento/aethernotes/releases/latest/download/Aether-Notes_x64.dmg">macOS (Intel)</a> · 
+          <a href="https://github.com/joshuasarmiento/aethernotes/releases/latest/download/Aether-Notes_x64_en-US.msi">Windows (.msi)</a> · 
+          <a href="https://github.com/joshuasarmiento/aethernotes/releases/latest/download/Aether-Notes.AppImage">Linux (.AppImage)</a>
         </div>
 
         <!-- Simulated Typing Workspace Mockup -->
@@ -185,12 +202,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 const mobileMenuOpen = ref(false);
 function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value;
 }
+
+const downloadUrl = computed(() => {
+  const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent.toLowerCase() : '';
+  const githubRepo = 'https://github.com/joshuasarmiento/aethernotes';
+  
+  if (userAgent.indexOf('win') !== -1) {
+    return `${githubRepo}/releases/latest/download/Aether-Notes_x64_en-US.msi`;
+  } else if (userAgent.indexOf('mac') !== -1) {
+    return `${githubRepo}/releases/latest/download/Aether-Notes_aarch64.dmg`;
+  } else if (userAgent.indexOf('linux') !== -1) {
+    return `${githubRepo}/releases/latest/download/Aether-Notes.AppImage`;
+  }
+  return `${githubRepo}/releases/latest`;
+});
+
+const osName = computed(() => {
+  const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent.toLowerCase() : '';
+  if (userAgent.indexOf('win') !== -1) return 'Windows';
+  if (userAgent.indexOf('mac') !== -1) return 'macOS';
+  if (userAgent.indexOf('linux') !== -1) return 'Linux';
+  return '';
+});
 
 interface SimulatedLine {
   text: string;
@@ -675,6 +714,39 @@ onUnmounted(() => {
 .hero-btn.secondary:hover {
   background: rgba(255, 255, 255, 0.8);
   border-color: #A19F9A;
+}
+
+.hero-btn.download-btn {
+  background: #1A1A18;
+  color: #FFFFFF;
+  border: 1px solid #1A1A18;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-btn.download-btn:hover {
+  opacity: 0.85;
+}
+
+.platform-downloads {
+  font-size: 10px;
+  color: #2E2D2B;
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.platform-downloads a {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.platform-downloads a:hover {
+  color: var(--accent);
 }
 
 /* ── Editor Mockup ── */

@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { db } from '@/lib/db';
+import { storage } from '@/lib/storage';
 import type { Note } from '@/types';
 import { nanoid } from '@/lib/nanoid';
 import { useSettingsStore } from './settings';
-import { encryptText, decryptText } from '@/lib/crypto';
+import { decryptText } from '@/lib/crypto';
 
 export function extractTags(content: string): string[] {
   const tags: string[] = [];
@@ -55,44 +55,8 @@ export const useNotesStore = defineStore('notes', () => {
   async function loadNotes() {
     isLoading.value = true;
     try {
-      const allDbNotes = await db.notes.toArray();
-      const decryptedNotes: Note[] = [];
-      const locked: Record<string, Note> = {};
-
-      for (const dbNote of allDbNotes) {
-        if (dbNote.encryptedWith === 'vault') {
-          if (settingsStore.encryptionKey) {
-            try {
-              const decryptedContent = await decryptText(
-                dbNote.content,
-                dbNote.iv || '',
-                settingsStore.encryptionKey
-              );
-              decryptedNotes.push({
-                ...dbNote,
-                content: decryptedContent,
-              });
-            } catch (err) {
-              console.error(`Failed to decrypt note ${dbNote.id}:`, err);
-              locked[dbNote.id] = dbNote;
-              decryptedNotes.push({
-                ...dbNote,
-                content: '🔒 This note is encrypted. Please enter passphrase to unlock.',
-              });
-            }
-          } else {
-            locked[dbNote.id] = dbNote;
-            decryptedNotes.push({
-              ...dbNote,
-              content: '🔒 This note is encrypted. Please enter passphrase to unlock.',
-            });
-          }
-        } else {
-          decryptedNotes.push(dbNote);
-        }
-      }
-
-      notes.value = decryptedNotes;
+      const { notes: loadedNotes, lockedNotes: locked } = await storage.loadNotes(settingsStore.encryptionKey);
+      notes.value = loadedNotes;
       lockedNotes.value = locked;
     } catch (err) {
       console.error('Failed to load notes:', err);
@@ -172,7 +136,7 @@ export const useNotesStore = defineStore('notes', () => {
     }
 
     // Optimistic Concurrency Check
-    const dbNote = await db.notes.get(id);
+    const dbNote = await storage.getNote(id);
     if (dbNote && dbNote.updatedAt > note.updatedAt) {
       concurrencyConflicts.value[id] = true;
       // Keep local in-memory edits so they can be recovered/overwritten
@@ -229,7 +193,7 @@ export const useNotesStore = defineStore('notes', () => {
     if (lockedNotes.value[id]) {
       delete lockedNotes.value[id];
     }
-    await db.notes.delete(id);
+    await storage.deleteNote(id);
   }
 
   async function emptyTrash() {
@@ -239,7 +203,7 @@ export const useNotesStore = defineStore('notes', () => {
       if (lockedNotes.value[id]) {
         delete lockedNotes.value[id];
       }
-      await db.notes.delete(id);
+      await storage.deleteNote(id);
     }
   }
 
@@ -252,60 +216,26 @@ export const useNotesStore = defineStore('notes', () => {
   }
 
   async function saveNoteToDb(note: Note) {
-    let dbNote = { ...note };
-
-    // Handle Encryption
-    if (settingsStore.encryptionEnabled && settingsStore.encryptionKey) {
-      try {
-        const { ciphertext, iv } = await encryptText(note.content, settingsStore.encryptionKey);
-        dbNote.content = ciphertext;
-        dbNote.iv = iv;
-        dbNote.encryptedWith = 'vault';
-      } catch (err) {
-        console.error(`Failed to encrypt note ${note.id}:`, err);
-      }
-    } else {
-      dbNote.encryptedWith = null;
-      dbNote.iv = undefined;
-    }
-
-    await db.notes.put(dbNote);
+    await storage.saveNote(note, settingsStore.encryptionKey, settingsStore.encryptionEnabled);
   }
 
   // Toggles encryption for all existing notes (e.g. when setting/removing key)
   async function toggleEncryptionForAllNotes(enable: boolean, key: CryptoKey | null) {
     for (const note of notes.value) {
-      // Don't re-encrypt locked notes (they are already encrypted in DB)
       if (lockedNotes.value[note.id]) continue;
       
-      if (enable && key) {
-        try {
-          const { ciphertext, iv } = await encryptText(note.content, key);
-          await db.notes.update(note.id, {
-            content: ciphertext,
-            iv: iv,
-            encryptedWith: 'vault',
-            updatedAt: Date.now()
-          });
-        } catch (err) {
-          console.error(`Encryption conversion failed for note ${note.id}:`, err);
-        }
-      } else {
-        await db.notes.update(note.id, {
-          content: note.content,
-          iv: undefined,
-          encryptedWith: null,
-          updatedAt: Date.now()
-        });
-      }
+      const updatedNote = {
+        ...note,
+        updatedAt: Date.now()
+      };
+      await storage.saveNote(updatedNote, key, enable);
     }
-    // Reload state from DB
     await loadNotes();
   }
 
   async function resolveConflict(id: string, action: 'overwrite' | 'discard') {
     if (action === 'discard') {
-      const dbNote = await db.notes.get(id);
+      const dbNote = await storage.getNote(id);
       if (dbNote) {
         const index = notes.value.findIndex(n => n.id === id);
         if (index !== -1) {
@@ -330,7 +260,7 @@ export const useNotesStore = defineStore('notes', () => {
         }
       }
     } else if (action === 'overwrite') {
-      const dbNote = await db.notes.get(id);
+      const dbNote = await storage.getNote(id);
       const index = notes.value.findIndex(n => n.id === id);
       if (index !== -1 && dbNote) {
         // Force write: update our local copy's updatedAt to match the database version,
@@ -339,7 +269,7 @@ export const useNotesStore = defineStore('notes', () => {
         await saveNoteToDb(notes.value[index]);
         // Also write current timestamp to mark our force write
         notes.value[index].updatedAt = Date.now();
-        await db.notes.update(id, { updatedAt: notes.value[index].updatedAt });
+        await saveNoteToDb(notes.value[index]);
       }
     }
     delete concurrencyConflicts.value[id];

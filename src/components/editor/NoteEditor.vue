@@ -136,6 +136,29 @@ const uiStore = useUiStore();
 const settingsStore = useSettingsStore();
 const autoSave = useAutoSave();
 
+const noteId = computed(() => {
+  if (route.name === 'note-detail') {
+    return route.params.id as string;
+  }
+  return null;
+});
+
+const activeNote = computed(() => {
+  if (!noteId.value) return null;
+  return notesStore.notes.find(n => n.id === noteId.value) || null;
+});
+
+const isTrashed = computed(() => {
+  return activeNote.value?.isTrashed || false;
+});
+
+const isLocked = computed(() => {
+  if (!noteId.value) return false;
+  return notesStore.lockedNotes[noteId.value] !== undefined;
+});
+
+const headings = ref<{ text: string; level: number; id: string }[]>([]);
+
 const passphrase = ref('');
 const unlockError = ref(false);
 
@@ -166,27 +189,6 @@ watch(hasConflict, (val) => {
   if (editor.value) {
     editor.value.setEditable(!isTrashed.value && !val, false);
   }
-});
-
-const noteId = computed(() => {
-  if (route.name === 'note-detail') {
-    return route.params.id as string;
-  }
-  return null;
-});
-
-const activeNote = computed(() => {
-  if (!noteId.value) return null;
-  return notesStore.notes.find(n => n.id === noteId.value) || null;
-});
-
-const isTrashed = computed(() => {
-  return activeNote.value?.isTrashed || false;
-});
-
-const isLocked = computed(() => {
-  if (!noteId.value) return false;
-  return notesStore.lockedNotes[noteId.value] !== undefined;
 });
 
 
@@ -334,8 +336,6 @@ watch(isLocked, (locked) => {
     loadedNoteId.value = noteId.value;
   }
 });
-
-const headings = ref<{ text: string; level: number; id: string }[]>([]);
 
 function updateHeadings() {
   if (!editor.value) return;

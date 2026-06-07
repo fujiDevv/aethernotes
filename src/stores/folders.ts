@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { db } from '@/lib/db';
+import { storage } from '@/lib/storage';
 import type { Folder } from '@/types';
 import { nanoid } from '@/lib/nanoid';
 import { useNotesStore } from './notes';
@@ -45,7 +45,7 @@ export const useFoldersStore = defineStore('folders', () => {
   async function loadFolders() {
     isLoading.value = true;
     try {
-      folders.value = await db.folders.toArray();
+      folders.value = await storage.loadFolders();
     } catch (err) {
       console.error('Failed to load folders:', err);
     } finally {
@@ -68,7 +68,7 @@ export const useFoldersStore = defineStore('folders', () => {
     };
 
     folders.value.push(newFolder);
-    await db.folders.put(newFolder);
+    await storage.saveFolder(newFolder);
     return newFolder;
   }
 
@@ -90,7 +90,7 @@ export const useFoldersStore = defineStore('folders', () => {
     }
 
     folders.value[index] = updatedFolder;
-    await db.folders.put(updatedFolder);
+    await storage.saveFolder(updatedFolder);
 
     // Recursively update descendants if parent path changed
     if (folder.path !== updatedFolder.path) {
@@ -105,7 +105,7 @@ export const useFoldersStore = defineStore('folders', () => {
       const childIndex = folders.value.findIndex(f => f.id === child.id);
       if (childIndex !== -1) {
         folders.value[childIndex].path = newChildPath;
-        await db.folders.put(folders.value[childIndex]);
+        await storage.saveFolder(folders.value[childIndex]);
         await updateDescendantPaths(child.id, newChildPath);
       }
     }
@@ -125,10 +125,9 @@ export const useFoldersStore = defineStore('folders', () => {
     // Remove from state
     folders.value = folders.value.filter(f => !idsToDelete.includes(f.id));
 
-    // Remove from Dexie
-    for (const folderId of idsToDelete) {
-      await db.folders.delete(folderId);
-    }
+    // Remove from storage
+    const childIds = idsToDelete.filter(cid => cid !== id);
+    await storage.deleteFolder(id, childIds);
 
     // Set note folder reference to null for any notes inside these folders
     notesStore.notes.forEach(note => {

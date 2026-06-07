@@ -41,23 +41,6 @@ export const useUiStore = defineStore('ui', () => {
     activeFolderId.value = null; // Clear folder filter when selecting tag
   }
 
-  // PWA Install state
-  const pwaInstallPrompt = ref<any>(null);
-  const showPwaPrompt = ref<boolean>(false);
-
-  function setPwaInstallPrompt(prompt: any) {
-    pwaInstallPrompt.value = prompt;
-    // If not running in standalone, and not dismissed before, trigger showing it
-    const dismissed = localStorage.getItem('pwa-prompt-dismissed');
-    if (dismissed !== 'true') {
-      showPwaPrompt.value = true;
-    }
-  }
-
-  function dismissPwaPrompt() {
-    showPwaPrompt.value = false;
-    localStorage.setItem('pwa-prompt-dismissed', 'true');
-  }
 
   return {
     isSidebarOpen,
@@ -70,15 +53,11 @@ export const useUiStore = defineStore('ui', () => {
     wordCount,
     charCount,
     saveStatus,
-    pwaInstallPrompt,
-    showPwaPrompt,
     toggleSidebar,
     toggleFocusMode,
     toggleSearch,
     toggleOutline,
     selectFolder,
-    selectTag,
-    setPwaInstallPrompt,
-    dismissPwaPrompt
+    selectTag
   };
 });

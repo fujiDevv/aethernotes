@@ -45,6 +45,10 @@ export const router = createRouter({
   routes,
 });
 
+function checkIsTauri(): boolean {
+  return typeof window !== 'undefined' && (!!(window as any).__TAURI__ || !!(window as any).__TAURI_INTERNALS__);
+}
+
 /**
  * Detect if the app is running as an installed PWA in standalone mode.
  * Works on Chrome/Edge (display-mode: standalone) and iOS Safari (navigator.standalone).
@@ -56,11 +60,11 @@ function isStandalone(): boolean {
   );
 }
 
-// Public-facing pages that should redirect to the editor when running as PWA
+// Public-facing pages that should redirect to the editor when running as PWA or Tauri
 const webOnlyRoutes = new Set(['landing', 'docs']);
 
 router.beforeEach((to) => {
-  if (isStandalone() && to.name && webOnlyRoutes.has(to.name as string)) {
+  if ((isStandalone() || checkIsTauri()) && to.name && webOnlyRoutes.has(to.name as string)) {
     return { name: 'note-empty' };
   }
 });

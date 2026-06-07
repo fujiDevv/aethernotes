@@ -66,8 +66,6 @@
     <!-- Command Palette (Ctrl/Cmd+K Search Modal) -->
     <CommandPalette />
 
-    <!-- PWA Installation Prompt Dialog -->
-    <PwaInstallPrompt />
 
     <!-- Documentation Dialog -->
     <DocsDialog v-if="uiStore.isDocsOpen" @close="uiStore.isDocsOpen = false" />
@@ -75,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, onBeforeUnmount } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useUiStore } from '@/stores/ui';
 import { useNotesStore } from '@/stores/notes';
@@ -92,7 +90,6 @@ import Sidebar from '@/components/sidebar/Sidebar.vue';
 import NoteList from '@/components/note-list/NoteList.vue';
 import StatusBar from './StatusBar.vue';
 import CommandPalette from '@/components/search/CommandPalette.vue';
-import PwaInstallPrompt from './PwaInstallPrompt.vue';
 import DocsDialog from './DocsDialog.vue';
 
 const route = useRoute();
@@ -148,8 +145,6 @@ const showContent = computed(() => {
   return true;
 });
 
-let handlePwaPrompt: ((e: any) => void) | null = null;
-
 onMounted(async () => {
   // Load preferences first (critical for encryption setup and theme)
   await settingsStore.loadSettings();
@@ -160,25 +155,6 @@ onMounted(async () => {
 
   // Clean old trashed items automatically
   await notesStore.purgeOldTrash(30);
-
-  // Sync captured prompt
-  if ((window as any).deferredPrompt) {
-    uiStore.setPwaInstallPrompt((window as any).deferredPrompt);
-  }
-
-  // Listen for beforeinstallprompt in case it fires later
-  handlePwaPrompt = (e: any) => {
-    e.preventDefault();
-    (window as any).deferredPrompt = e;
-    uiStore.setPwaInstallPrompt(e);
-  };
-  window.addEventListener('beforeinstallprompt', handlePwaPrompt);
-});
-
-onBeforeUnmount(() => {
-  if (handlePwaPrompt) {
-    window.removeEventListener('beforeinstallprompt', handlePwaPrompt);
-  }
 });
 </script>
 

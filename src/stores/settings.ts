@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { db } from '@/lib/db';
+import { storage } from '@/lib/storage';
 import type { Settings } from '@/types';
 import { generateSalt, bufToHex } from '@/lib/crypto';
 
@@ -22,8 +22,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const encryptionSalt = ref<string | null>(null);
 
   async function loadSettings() {
-    const all = await db.settings.toArray();
-    const settingsMap = new Map(all.map(s => [s.key, s.value]));
+    const settingsMap = new Map(Object.entries(await storage.loadSettings()));
 
     if (settingsMap.has('theme')) theme.value = settingsMap.get('theme');
     if (settingsMap.has('fontSize')) fontSize.value = Number(settingsMap.get('fontSize'));
@@ -41,7 +40,7 @@ export const useSettingsStore = defineStore('settings', () => {
     } else {
       const newSalt = generateSalt();
       const saltHex = bufToHex(newSalt.buffer as ArrayBuffer);
-      await db.settings.put({ key: 'encryptionSalt', value: saltHex });
+      await storage.saveSetting('encryptionSalt', saltHex);
       encryptionSalt.value = saltHex;
     }
   }
@@ -58,7 +57,7 @@ export const useSettingsStore = defineStore('settings', () => {
     else if (key === 'showLineNumbers') showLineNumbers.value = value as any;
     else if (key === 'encryptionEnabled') encryptionEnabled.value = value as any;
 
-    await db.settings.put({ key, value });
+    await storage.saveSetting(key, value);
   }
 
   function setEncryptionKey(key: CryptoKey | null) {

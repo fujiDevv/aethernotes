@@ -74,132 +74,210 @@
       <!-- Main Content -->
       <main class="docs-content">
 
-        <!-- Introduction -->
-        <section id="introduction" class="doc-section">
-          <h1 class="doc-h1 font-display">Introduction</h1>
-          <p class="doc-p">Aether Notes is a local-first, zero-knowledge notes workspace running entirely in the browser. Built using Vue 3, Tiptap/ProseMirror core, Pinia, and Dexie.js (IndexedDB), it features zero-knowledge client-side encryption via the Web Crypto API.</p>
-          <div class="doc-callout info">
-            <strong>Offline Support:</strong> Fully cached via service worker PWA, allowing complete offline functionality.
-          </div>
-        </section>
-
-        <hr class="doc-divider" />
-
-        <!-- Getting Started -->
-        <section id="getting-started" class="doc-section">
-          <h2 class="doc-h2 font-display">Getting Started</h2>
-          <p class="doc-p">Simply open Aether Notes on the web and configure your private password (or passphrase) when prompted. This passphrase derives the local key to encrypt and lock your notes database.</p>
-          <div class="doc-callout warning">
-            <strong>Password Loss = Data Loss:</strong> We do not have servers, meaning there is no recovery option. Write your passphrase down and store it safely.
-          </div>
-        </section>
-
-        <hr class="doc-divider" />
-
-        <!-- Editor -->
-        <section id="editor" class="doc-section">
-          <h2 class="doc-h2 font-display">Editor & Formatting</h2>
-          <p class="doc-p">Powered by Tiptap (ProseMirror core), the editor parses markdown input rules as you type or through the floating bubble menu.</p>
-          <p class="doc-p"><strong>Slash commands:</strong> Type <code class="inline-code">/</code> at the end of any line to trigger formatting toggles (Paragraph, H1, H2, H3).</p>
+        <!-- Blueprint -->
+        <section id="blueprint" class="doc-section">
+          <h1 class="doc-h1 font-display">Architectural Blueprint & Design Strategy</h1>
+          <p class="doc-p">When decoupling a PWA framework to build a downloadable binary for Windows, Linux, and macOS, selecting the correct container runtime directly influences compilation sizes and application memory footprints.</p>
           
+          <h3 class="doc-h3">1.1 Technology Evaluation: Tauri vs. Electron</h3>
           <table class="doc-table">
             <thead>
               <tr>
-                <th>Syntax</th>
-                <th>Format</th>
+                <th>Metric</th>
+                <th>Tauri v2 (Recommended)</th>
+                <th>Electron / Chromium Containers</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td><code class="inline-code">**bold**</code></td><td>Bold text</td></tr>
-              <tr><td><code class="inline-code">_italic_</code></td><td>Italic text</td></tr>
-              <tr><td><code class="inline-code">~~strike~~</code></td><td>Strikethrough</td></tr>
-              <tr><td><code class="inline-code">`code`</code></td><td>Inline code</td></tr>
-              <tr><td><code class="inline-code">==highlight==</code></td><td>Highlight mark</td></tr>
-            </tbody>
-          </table>
-
-          <p class="doc-p"><strong>Inline Tags:</strong> Prefix any keyword with an <code class="inline-code">@</code> symbol (e.g. <code class="inline-code">@idea</code>) to tag your text. Tags are indexed in the sidebar for quick scroll-anchoring.</p>
-        </section>
-
-        <hr class="doc-divider" />
-
-        <!-- Keyboard Shortcuts -->
-        <section id="shortcuts" class="doc-section">
-          <h2 class="doc-h2 font-display">Keyboard Shortcuts</h2>
-          <table class="doc-table">
-            <thead>
               <tr>
-                <th>Shortcut</th>
-                <th>Action</th>
+                <td><strong>Bundle Scale Optimization</strong></td>
+                <td><strong>~10–15 MB</strong><br>Uses native host OS webview (WebView2, WebKitGTK, or WKWebView).</td>
+                <td><strong>~80 MB+</strong><br>Bundles full autonomous Chromium + Node.js runtime.</td>
               </tr>
-            </thead>
-            <tbody>
-              <tr><td><kbd>Cmd/Ctrl + K</kbd></td><td>Open Search / Command Palette</td></tr>
-              <tr><td><kbd>Cmd/Ctrl + N</kbd></td><td>New Note</td></tr>
-              <tr><td><kbd>Cmd/Ctrl + \</kbd></td><td>Toggle Sidebar</td></tr>
-              <tr><td><kbd>Cmd/Ctrl + B</kbd></td><td>Bold</td></tr>
-              <tr><td><kbd>Cmd/Ctrl + I</kbd></td><td>Italic</td></tr>
-              <tr><td><kbd>Cmd/Ctrl + Shift + X</kbd></td><td>Strikethrough</td></tr>
-              <tr><td><kbd>Cmd/Ctrl + E</kbd></td><td>Inline Code</td></tr>
+              <tr>
+                <td><strong>Memory Isolation</strong></td>
+                <td><strong>Sandboxed Rust-based processing cycles</strong>;<br>lower application runtime footprint when idling.</td>
+                <td>Heavy, multi-threaded Chromium rendering pipelines.</td>
+              </tr>
+              <tr>
+                <td><strong>System Protections</strong></td>
+                <td><strong>Default isolation of high-privilege APIs</strong>;<br>system calls funneled via Inter-Process Communication (IPC) boundary.</td>
+                <td>Direct access to Node.js APIs from frontend context by default (higher risk).</td>
+              </tr>
             </tbody>
           </table>
+
+          <h3 class="doc-h3">1.2 Desktop Storage Topology</h3>
+          <p class="doc-p">The database architecture uses a persistent storage boundary that targets either local raw Markdown files or IndexedDB fallback. When running inside the Tauri native desktop wrapper, storage persistence utilizes direct OS capabilities.</p>
+
+          <div class="doc-callout info">
+            <strong>Option 1: Isolated Hybrid Mode</strong><br>
+            Retain the Dexie.js and IndexedDB engine configurations. Because Tauri's underlying WebView container handles data isolation at the application sandbox layer, database persistence maps directly to system disk space—fully bypassing browser history clearing behaviors or disk-eviction routines.
+          </div>
+
+          <div class="doc-callout warning">
+            <strong>Option 2: Native File System Binding (Raw Markdown Integration)</strong><br>
+            Replace the browser abstraction layer entirely by leveraging Tauri's high-privileged file-system plugin system. This enables user-defined directory streaming, allowing the system to securely parse, decrypt, and save changes into raw, localized <code class="inline-code">.md</code> files on the host computer.
+          </div>
         </section>
 
         <hr class="doc-divider" />
 
-        <!-- Command Search -->
-        <section id="command-palette" class="doc-section">
-          <h2 class="doc-h2 font-display">Command Search</h2>
-          <p class="doc-p">Press <kbd>Cmd/Ctrl + K</kbd> to open the palette powered by Fuse.js fuzzy search. Quickly scan titles, bodies, and tags, or type commands like <code class="inline-code">settings</code> or <code class="inline-code">trash</code>.</p>
-        </section>
+        <!-- Prerequisites -->
+        <section id="prerequisites" class="doc-section">
+          <h2 class="doc-h2 font-display">Infrastructure Prerequisites</h2>
+          <p class="doc-p">To compile the underlying Rust application layer into platform-native installation packages, developers' environments must fulfill the compilation toolchain dependencies listed below:</p>
 
-        <hr class="doc-divider" />
-
-        <!-- Organization -->
-        <section id="organization" class="doc-section">
-          <h2 class="doc-h2 font-display">Organization</h2>
-          <p class="doc-p"><strong>Nested Folders:</strong> Create subfolders and re-parent structures via drag-and-drop. Deleting a folder safely moves its notes to Uncategorized.</p>
-          <p class="doc-p"><strong>Favorites & Trash:</strong> Star notes to pin them in the sidebar. Configure automatic trash purging (7 days, 30 days, or never) under Settings.</p>
-        </section>
-
-        <hr class="doc-divider" />
-
-        <!-- Security -->
-        <section id="security" class="doc-section">
-          <h2 class="doc-h2 font-display">How Privacy Works</h2>
-          <p class="doc-p">All cryptographic operations run client-side via the Web Crypto API.</p>
+          <h3 class="doc-h3">2.1 Microsoft Windows Environments</h3>
           <ul class="doc-list">
-            <li><strong>PBKDF2 Derivation:</strong> Key derived using PBKDF2 (100,000 iterations) with a local random salt.</li>
-            <li><strong>AES-256-GCM:</strong> Derived key encrypts/decrypts notes in-memory. The key never touches IndexedDB or localStorage.</li>
-            <li><strong>IndexedDB Storage:</strong> Encrypted ciphertext, random IV, and authentication tag are stored locally.</li>
-            <li><strong>Cryptographic Resilience:</strong> In case of decryption failures due to missing or mismatched salts, the application safely intercepts the failure and redirects the user to an isolated Recovery Screen, avoiding top-level crashes and allowing settings reset.</li>
+            <li><strong>Compilation Engine:</strong> Install the standard Microsoft Visual Studio Build Tools suite, ensuring the <strong>Desktop Development with C++</strong> package is explicitly enabled.</li>
+            <li><strong>Rendering Component:</strong> Ensure the Microsoft WebView2 Runtime environment is present (provisioned automatically inside default Windows 10/11 system layers).</li>
           </ul>
-        </section>
 
-        <hr class="doc-divider" />
-
-        <!-- PWA -->
-        <section id="pwa" class="doc-section">
-          <h2 class="doc-h2 font-display">App Installation</h2>
-          <p class="doc-p">Install Aether Notes as a Progressive Web App (PWA) to run offline:</p>
+          <h3 class="doc-h3">2.2 Apple macOS Environments</h3>
           <ul class="doc-list">
-            <li><strong>Desktop (Chrome/Edge/Safari):</strong> Click the install icon in the address bar.</li>
-            <li><strong>iOS Safari:</strong> Tap Share → Add to Home Screen.</li>
-            <li><strong>Android Chrome:</strong> Tap the install banner.</li>
-            <li><strong>Offline Font Caching:</strong> Critical font distributions are pre-cached by the service worker to guarantee immediate layout stability and avoid jarring font swapping when starting entirely offline.</li>
+            <li><strong>Compilation Engine:</strong> Command-line development compilation tools must be provisioned via the terminal:</li>
           </ul>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" @click="copyText('xcode-select --install')">{{ copied === 'xcode-select --install' ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>xcode-select --install</code></pre>
+          </div>
+
+          <h3 class="doc-h3">2.3 GNU/Linux Environments (Debian/Ubuntu Core)</h3>
+          <ul class="doc-list">
+            <li><strong>System Dependencies:</strong> Execute system package synchronizations to install the modern WebKit libraries, rendering toolchains, and visual target compilation tools required for the WebKitGTK platform backend:</li>
+          </ul>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" @click="copyText('sudo apt update && sudo apt install -y curl wget build-essential libssl-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev')">{{ copied === 'sudo apt update && sudo apt install -y curl wget build-essential libssl-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev' ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>sudo apt update
+sudo apt install -y curl wget build-essential libssl-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev</code></pre>
+          </div>
         </section>
 
         <hr class="doc-divider" />
 
-        <!-- Data Safety -->
-        <section id="data-safety" class="doc-section">
-          <h2 class="doc-h2 font-display">Data Safety & Backup</h2>
-          <p class="doc-p">Back up and download your data in Settings under Data Portability:</p>
+        <!-- Migration Steps -->
+        <section id="migration-steps" class="doc-section">
+          <h2 class="doc-h2 font-display">Step-by-Step Implementation</h2>
+          <p class="doc-p">Follow these systematic steps to migrate from Progressive Web App (PWA) configurations to native Tauri packaging.</p>
+
+          <h3 class="doc-h3">Step 3.1: Package Initializations</h3>
+          <p class="doc-p">Initialize the internal native compilation manifest file inside the absolute root directory of your project folder using <code class="inline-code">bun</code>:</p>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" @click="copyText('bun add -d @tauri-apps/cli@latest && bun tauri init')">{{ copied === 'bun add -d @tauri-apps/cli@latest && bun tauri init' ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>bun add -d @tauri-apps/cli@latest
+bun tauri init</code></pre>
+          </div>
+          <p class="doc-p">When prompted by the configuration wizard, inject the target operational values defined below:</p>
           <ul class="doc-list">
-            <li><strong>Export Vault (JSON):</strong> Full encrypted database snapshot file including settings and note history.</li>
-            <li><strong>Export Markdown (ZIP):</strong> Generates a folder structure containing all notes exported as raw Markdown (.md) text files inside a ZIP archive.</li>
-            <li><strong>Optimistic Concurrency Control:</strong> To protect against accidental overwrites across multiple sessions or tabs, Aether Notes uses optimistic locking. If a timestamp mismatch is detected, edits are frozen and a resolution banner lets you choose between keeping local edits or syncing from the database.</li>
+            <li><strong>App Name:</strong> <code class="inline-code">Aether Notes</code></li>
+            <li><strong>Window Title:</strong> <code class="inline-code">Aether Notes</code></li>
+            <li><strong>Web Assets Location:</strong> <code class="inline-code">../dist</code> (maps production asset delivery layers safely relative to native outputs)</li>
+            <li><strong>URL of Dev Server:</strong> <code class="inline-code">http://localhost:5173</code></li>
+            <li><strong>Frontend Dev Command:</strong> <code class="inline-code">bun run dev</code></li>
+            <li><strong>Frontend Build Command:</strong> <code class="inline-code">bun run build</code></li>
+          </ul>
+
+          <h3 class="doc-h3">Step 3.2: Native Configuration of vite.config.ts</h3>
+          <p class="doc-p">Modify your <code class="inline-code">vite.config.ts</code> blueprint to clean out web-dependent asset pre-caching routines, adjust compilation target engines to modern webview runtimes, and prevent hanging threads during automated build-step cycles:</p>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>vite.config.ts</span>
+              <button class="copy-btn" @click="copyText(viteConfigSnippet)">{{ copied === viteConfigSnippet ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>{{ viteConfigSnippet }}</code></pre>
+          </div>
+
+          <h3 class="doc-h3">Step 3.3: Configuration of Application Boundaries (tauri.conf.json)</h3>
+          <p class="doc-p">The <code class="inline-code">src-tauri/tauri.conf.json</code> file configures your core cross-platform settings, native scaling boundaries, application identifier paths, and hardware asset packaging trees:</p>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>src-tauri/tauri.conf.json</span>
+              <button class="copy-btn" @click="copyText(tauriConfigSnippet)">{{ copied === tauriConfigSnippet ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>{{ tauriConfigSnippet }}</code></pre>
+          </div>
+
+          <h3 class="doc-h3">Step 3.4: Deprecating Web-Only PWA Modules</h3>
+          <p class="doc-p">Because your application layer now executes natively inside an isolated desktop shell interface framework, any PWA storage management utilities must be decoupled:</p>
+          <div class="doc-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <strong>Remove prompt component</strong>
+                <p>Purge the component file completely from your local development repository directory tree: <code class="inline-code">src/components/layout/PwaInstallPrompt.vue</code>.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <strong>Remove registration routines</strong>
+                <p>Delete import instances or registration mappings processing the virtual service worker layer (<code class="inline-code">virtual:pwa-register</code>) from your main lifecycle orchestration entry points (<code class="inline-code">src/main.ts</code> or <code class="inline-code">src/components/layout/AppShell.vue</code>).</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- OS Integrations -->
+        <section id="os-integrations" class="doc-section">
+          <h2 class="doc-h2 font-display">Advanced OS Integrations</h2>
+          <p class="doc-p">By decoupling from the browser runtime sandbox, you can extend core system functionalities by invoking low-level cross-platform plugins.</p>
+
+          <h3 class="doc-h3">4.1 Deep-Integrated OS Hotkeys (Global Shortcut Routines)</h3>
+          <p class="doc-p">Instead of listening for event interactions exclusively when focus is maintained within your active window area, you can capture macro hotkeys system-wide by binding commands to Tauri's global shortcut listeners:</p>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>TypeScript</span>
+              <button class="copy-btn" @click="copyText(globalShortcutSnippet)">{{ copied === globalShortcutSnippet ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>{{ globalShortcutSnippet }}</code></pre>
+          </div>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Development & Build Pipeline -->
+        <section id="dev-pipeline" class="doc-section">
+          <h2 class="doc-h2 font-display">Development & Build Pipeline</h2>
+          <p class="doc-p">Execute these commands to build and run your native desktop application packages.</p>
+
+          <h3 class="doc-h3">5.1 Run Local Application Development Sandbox</h3>
+          <p class="doc-p">Launches your local live-reloaded dev environment side-by-side with a localized native debugging window frame layer to process desktop diagnostics:</p>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" @click="copyText('bun tauri dev')">{{ copied === 'bun tauri dev' ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>bun tauri dev</code></pre>
+          </div>
+
+          <h3 class="doc-h3">5.2 Build Platform-Hardened Distribution Installers</h3>
+          <p class="doc-p">Executes your full client-side minification assets pipeline, packages code into secure bundles, and builds optimized setup binaries for distribution:</p>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" @click="copyText('bun tauri build')">{{ copied === 'bun tauri build' ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>bun tauri build</code></pre>
+          </div>
+
+          <h3 class="doc-h3">5.3 Automated Release Artifact Map</h3>
+          <p class="doc-p">Upon successful compilation, your production setup files and distribution payloads are generated automatically within the release path directory (<code class="inline-code">src-tauri/target/release/bundle/</code>):</p>
+          <ul class="doc-list">
+            <li><strong>Windows Compilations:</strong> Generates fully optimized <code class="inline-code">.exe</code> runtime configuration frameworks alongside modular system <code class="inline-code">.msi</code> install packages.</li>
+            <li><strong>macOS Compilations:</strong> Provisioned as compiled application volumes (<code class="inline-code">.app</code>) alongside mountable disk image arrays (<code class="inline-code">.dmg</code>).</li>
+            <li><strong>Linux Compilations:</strong> Packaged into portable application executables (<code class="inline-code">.AppImage</code>) alongside platform-native Debian package containers (<code class="inline-code">.deb</code>).</li>
           </ul>
         </section>
 
@@ -227,39 +305,151 @@ function cycleTheme() {
   settingsStore.setSetting('theme', themes[nextIdx]);
 }
 
+// Copy to clipboard helper
+const copied = ref<string | null>(null);
+function copyText(text: string) {
+  navigator.clipboard.writeText(text);
+  copied.value = text;
+  setTimeout(() => {
+    if (copied.value === text) {
+      copied.value = null;
+    }
+  }, 2000);
+}
 
+// Snippet contents
+const viteConfigSnippet = `/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config';
+import vue from '@vitejs/plugin-vue';
+import path from 'path';
+
+export default defineConfig(({ command }) => {
+  const plugins = [vue()];
+
+  // Ensures strict process termination under Bun compilation boundaries
+  if (command === "build") {
+    plugins.push({
+      name: "force-exit",
+      closeBundle() {
+        const bun = (globalThis as any).Bun;
+        if (bun) {
+          bun.exit(0);
+        } else {
+          process.exit(0);
+        }
+      },
+    });
+  }
+
+  return {
+    plugins,
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
+    },
+    clearScreen: false,
+    server: {
+      port: 5173,
+      strictPort: true,
+      host: true,
+    },
+    envPrefix: ['VITE_', 'TAURI_ENV_'],
+    build: {
+      target: process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari15',
+      minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
+      sourcemap: !!process.env.TAURI_ENV_DEBUG,
+      chunkSizeWarningLimit: 1000,
+    },
+    test: {
+      environment: 'happy-dom',
+      globals: true,
+      threads: false,
+    },
+  };
+});`;
+
+const tauriConfigSnippet = `{
+  "productName": "Aether Notes",
+  "version": "1.0.0",
+  "identifier": "com.aethernotes.app",
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Aether Notes",
+        "width": 1024,
+        "height": 768,
+        "minWidth": 800,
+        "minHeight": 600,
+        "resizable": true,
+        "decorations": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "build": {
+    "beforeDevCommand": "bun run dev",
+    "beforeBuildCommand": "bun run build",
+    "devUrl": "http://localhost:5173",
+    "distDir": "../dist"
+  }
+}`;
+
+const globalShortcutSnippet = `import { register } from '@tauri-apps/plugin-global-shortcut';
+
+/**
+ * Binds a global cross-platform keystroke sequence straight into the host system.
+ * This wakes your CommandPalette.vue component up even if the app layout is obscured or minimized.
+ */
+async function setupGlobalShortcut(openCommandPaletteCallback: () => void) {
+  await register('CommandOrControl+Shift+K', (event) => {
+    if (event.state === 'Pressed') {
+      openCommandPaletteCallback();
+    }
+  });
+}`;
 
 // Active section tracking
-const activeSection = ref('introduction');
+const activeSection = ref('blueprint');
 
 const navSections = [
   {
-    label: 'Overview',
+    label: 'Architecture',
     items: [
-      { id: 'introduction', title: 'Introduction' },
-      { id: 'getting-started', title: 'Getting Started' },
+      { id: 'blueprint', title: 'Architectural Blueprint' },
+      { id: 'prerequisites', title: 'Infrastructure Prerequisites' },
     ],
   },
   {
-    label: 'Using Aether',
+    label: 'Migration',
     items: [
-      { id: 'editor', title: 'Editor & Formatting' },
-      { id: 'shortcuts', title: 'Keyboard Shortcuts' },
-      { id: 'command-palette', title: 'Command Search' },
-      { id: 'organization', title: 'Organization' },
+      { id: 'migration-steps', title: 'Step-by-Step Implementation' },
     ],
   },
   {
-    label: 'Security',
+    label: 'Integrations',
     items: [
-      { id: 'security', title: 'How Privacy Works' },
+      { id: 'os-integrations', title: 'Advanced OS Integrations' },
     ],
   },
   {
-    label: 'Platform',
+    label: 'Deployment',
     items: [
-      { id: 'pwa', title: 'App Installation' },
-      { id: 'data-safety', title: 'Data Safety & Backup' },
+      { id: 'dev-pipeline', title: 'Development & Build' },
     ],
   },
 ];
@@ -658,13 +848,11 @@ onUnmounted(() => {
 
 .doc-callout.info {
   background: var(--accent-subtle);
-  /* border-left: 3px solid var(--accent); */
   color: var(--text-primary);
 }
 
 .doc-callout.warning {
   background: rgba(217, 115, 13, 0.06);
-  /* border-left: 3px solid var(--notion-orange); */
   color: var(--text-primary);
 }
 

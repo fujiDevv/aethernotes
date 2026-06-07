@@ -4,12 +4,6 @@ import router from '@/router';
 import './style.css';
 import App from './App.vue';
 
-// Capture PWA install prompt early
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  (window as any).deferredPrompt = e;
-});
-
 const app = createApp(App);
 const pinia = createPinia();
 
