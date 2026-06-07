@@ -289,26 +289,26 @@ async function handleInstall() {
 
 .slide-up-enter-from,
 .slide-up-leave-to {
-  transform: translateY(20px);
-  opacity: 0;
+  transform: translateY(100%);
+  opacity: 1;
 }
 
-/* Mobile responsive drawer view */
-@media (max-width: 480px) {
+/* Desktop responsive view */
+@media (min-width: 481px) {
   .pwa-prompt-container {
-    bottom: 0;
-    right: 0;
-    left: 0;
-    width: 100%;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    border-bottom: none;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    bottom: 20px;
+    right: 20px;
+    left: auto;
+    width: 320px;
+    border-radius: var(--radius-lg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
   }
 
   .slide-up-enter-from,
   .slide-up-leave-to {
-    transform: translateY(100%);
-    opacity: 1;
+    transform: translateY(20px);
+    opacity: 0;
   }
 }
 </style>

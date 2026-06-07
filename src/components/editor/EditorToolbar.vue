@@ -461,7 +461,10 @@ function cancelLink() {
 
 .bubble-menu {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
+  max-width: calc(100vw - 32px);
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius);

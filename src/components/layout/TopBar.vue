@@ -200,65 +200,68 @@ function goBack() {
 .search-trigger {
   display: flex;
   align-items: center;
+  justify-content: center;
   height: 32px;
-  padding: 0 var(--space-sm) 0 var(--space-md);
-  border: 1px solid var(--border);
+  width: 32px;
+  padding: 0;
+  border: none;
   border-radius: var(--radius);
-  background: var(--bg-sunken);
+  background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  width: 180px;
   transition: all var(--duration-fast) var(--ease-out);
 }
 
 .search-trigger:hover {
-  border-color: var(--text-muted);
-  color: var(--text-secondary);
+  background: var(--bg-sunken);
 }
 
 .search-icon {
-  margin-right: var(--space-sm);
+  margin-right: 0;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.search-placeholder {
-  font-size: 11px;
-  text-align: left;
-  flex: 1;
-}
-
+.search-placeholder,
 .shortcut {
-  font-size: 10px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 1px 4px;
-  color: var(--text-secondary);
-  margin-left: var(--space-xs);
-  flex-shrink: 0;
+  display: none;
 }
 
-@media (max-width: 767px) {
+@media (min-width: 768px) {
   .search-trigger {
-    width: 32px;
-    padding: 0;
-    justify-content: center;
-    background: transparent;
-    border: none;
+    width: 180px;
+    padding: 0 var(--space-sm) 0 var(--space-md);
+    background: var(--bg-sunken);
+    border: 1px solid var(--border);
+    justify-content: flex-start;
   }
 
   .search-trigger:hover {
-    background: var(--bg-sunken);
+    border-color: var(--text-muted);
+    color: var(--text-secondary);
   }
 
   .search-icon {
-    margin-right: 0;
+    margin-right: var(--space-sm);
   }
 
-  .search-placeholder,
+  .search-placeholder {
+    display: block;
+    font-size: 11px;
+    text-align: left;
+    flex: 1;
+  }
+
   .shortcut {
-    display: none;
+    display: inline-block;
+    font-size: 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 4px;
+    color: var(--text-secondary);
+    margin-left: var(--space-xs);
+    flex-shrink: 0;
   }
 }
 </style>
