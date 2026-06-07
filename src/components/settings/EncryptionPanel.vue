@@ -80,7 +80,7 @@
 import { ref, computed } from 'vue';
 import { useSettingsStore } from '@/stores/settings';
 import { useNotesStore } from '@/stores/notes';
-import { deriveKey, generateSalt, bufToHex, hexToBuf } from '@/lib/crypto';
+import { deriveKey, generateSalt, bufToHex, hexToBuf, resetDecryptionError } from '@/lib/crypto';
 import { db } from '@/lib/db';
 
 const settingsStore = useSettingsStore();
@@ -101,6 +101,7 @@ async function enableVault() {
   errorText.value = '';
 
   try {
+    resetDecryptionError();
     // Generate salt if not exists
     let saltHex = settingsStore.encryptionSalt;
     if (!saltHex) {
@@ -125,6 +126,7 @@ async function enableVault() {
   } catch (err) {
     console.error('Failed to enable encryption:', err);
     errorText.value = 'Failed to enable encryption. Try again.';
+    resetDecryptionError();
   } finally {
     isWorking.value = false;
   }
@@ -144,6 +146,7 @@ async function unlockVault() {
   errorText.value = '';
 
   try {
+    resetDecryptionError();
     const saltBytes = hexToBuf(settingsStore.encryptionSalt);
     const key = await deriveKey(code, saltBytes);
     
@@ -157,10 +160,12 @@ async function unlockVault() {
       passphrase.value = '';
     } else {
       errorText.value = 'Incorrect passphrase.';
+      resetDecryptionError();
     }
   } catch (err) {
     console.error('Decryption failed:', err);
     errorText.value = 'Unlock failed. Incorrect passphrase.';
+    resetDecryptionError();
   } finally {
     isWorking.value = false;
   }
@@ -172,6 +177,7 @@ async function disableVault() {
   errorText.value = '';
 
   try {
+    resetDecryptionError();
     // Decrypt and write all notes in plaintext format
     await notesStore.toggleEncryptionForAllNotes(false, null);
     
@@ -184,6 +190,7 @@ async function disableVault() {
   } catch (err) {
     console.error('Failed to disable encryption:', err);
     errorText.value = 'Decryption process failed.';
+    resetDecryptionError();
   } finally {
     isWorking.value = false;
   }

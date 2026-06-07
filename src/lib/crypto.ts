@@ -1,3 +1,15 @@
+import { ref } from 'vue';
+
+export const decryptionError = ref<{
+  hasError: boolean;
+  message: string;
+  isMissingSalt: boolean;
+} | null>(null);
+
+export function resetDecryptionError() {
+  decryptionError.value = null;
+}
+
 /**
  * Generates a cryptographically random 16-byte salt.
  */
@@ -30,28 +42,50 @@ export function hexToBuf(hexString: string): Uint8Array<ArrayBuffer> {
 /**
  * Derives a 256-bit AES-GCM key from a passphrase and a salt using PBKDF2.
  */
-export async function deriveKey(passphrase: string, salt: Uint8Array<ArrayBuffer>): Promise<CryptoKey> {
-  const enc = new TextEncoder();
-  const keyMaterial = await globalThis.crypto.subtle.importKey(
-    'raw',
-    enc.encode(passphrase),
-    { name: 'PBKDF2' },
-    false,
-    ['deriveBits', 'deriveKey']
-  );
+export async function deriveKey(passphrase: string, salt: Uint8Array<ArrayBuffer> | null | undefined): Promise<CryptoKey> {
+  if (!salt || salt.byteLength === 0) {
+    const err = new Error('Cryptographic salt is missing or invalid.');
+    decryptionError.value = {
+      hasError: true,
+      message: err.message,
+      isMissingSalt: true
+    };
+    throw err;
+  }
 
-  return globalThis.crypto.subtle.deriveKey(
-    {
-      name: 'PBKDF2',
-      salt: salt,
-      iterations: 100000,
-      hash: 'SHA-256'
-    },
-    keyMaterial,
-    { name: 'AES-GCM', length: 256 },
-    true,
-    ['encrypt', 'decrypt']
-  );
+  const enc = new TextEncoder();
+  try {
+    const keyMaterial = await globalThis.crypto.subtle.importKey(
+      'raw',
+      enc.encode(passphrase),
+      { name: 'PBKDF2' },
+      false,
+      ['deriveBits', 'deriveKey']
+    );
+
+    return await globalThis.crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: 100000,
+        hash: 'SHA-256'
+      },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      true,
+      ['encrypt', 'decrypt']
+    );
+  } catch (err: any) {
+    console.error('deriveKey failed:', err);
+    if (!decryptionError.value) {
+      decryptionError.value = {
+        hasError: true,
+        message: err.message || 'Key derivation failed',
+        isMissingSalt: false
+      };
+    }
+    throw err;
+  }
 }
 
 /**
@@ -77,15 +111,25 @@ export async function encryptText(text: string, key: CryptoKey): Promise<{ ciphe
  * Decrypts ciphertext hex string using AES-GCM 256-bit with the derived key.
  */
 export async function decryptText(ciphertextHex: string, ivHex: string, key: CryptoKey): Promise<string> {
-  const dec = new TextDecoder();
-  const ciphertext = hexToBuf(ciphertextHex);
-  const iv = hexToBuf(ivHex);
+  try {
+    const dec = new TextDecoder();
+    const ciphertext = hexToBuf(ciphertextHex);
+    const iv = hexToBuf(ivHex);
 
-  const decryptedBuffer = await globalThis.crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv },
-    key,
-    ciphertext
-  );
+    const decryptedBuffer = await globalThis.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      ciphertext
+    );
 
-  return dec.decode(decryptedBuffer);
+    return dec.decode(decryptedBuffer);
+  } catch (err: any) {
+    console.error('decryptText failed:', err);
+    decryptionError.value = {
+      hasError: true,
+      message: err.message || 'Decryption failed (mismatched key/salt)',
+      isMissingSalt: false
+    };
+    throw err;
+  }
 }

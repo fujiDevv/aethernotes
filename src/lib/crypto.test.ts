@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { generateSalt, bufToHex, hexToBuf, deriveKey, encryptText, decryptText } from './crypto';
+import { generateSalt, bufToHex, hexToBuf, deriveKey, encryptText, decryptText, decryptionError, resetDecryptionError } from './crypto';
 
 // Polyfill window.crypto if not present in the test environment
 beforeAll(() => {
@@ -61,5 +61,28 @@ describe('Crypto Library', () => {
     const wrongKey = await deriveKey('wrong-passphrase', salt);
 
     await expect(decryptText(ciphertext, iv, wrongKey)).rejects.toThrow();
+  });
+
+  it('should throw and set decryptionError if salt is missing', async () => {
+    resetDecryptionError();
+    expect(decryptionError.value).toBeNull();
+
+    await expect(deriveKey('passphrase', null as any)).rejects.toThrow();
+    expect(decryptionError.value).not.toBeNull();
+    expect(decryptionError.value?.hasError).toBe(true);
+    expect(decryptionError.value?.isMissingSalt).toBe(true);
+  });
+
+  it('should set decryptionError on decryption failure', async () => {
+    resetDecryptionError();
+    const salt = generateSalt();
+    const key = await deriveKey('correct-passphrase', salt);
+    const { ciphertext, iv } = await encryptText('Secret message', key);
+    const wrongKey = await deriveKey('wrong-passphrase', salt);
+
+    await expect(decryptText(ciphertext, iv, wrongKey)).rejects.toThrow();
+    expect(decryptionError.value).not.toBeNull();
+    expect(decryptionError.value?.hasError).toBe(true);
+    expect(decryptionError.value?.isMissingSalt).toBe(false);
   });
 });

@@ -22,6 +22,7 @@ export const useNotesStore = defineStore('notes', () => {
   const notes = ref<Note[]>([]);
   const isLoading = ref<boolean>(false);
   const lockedNotes = ref<Record<string, Note>>({}); // Cache notes that couldn't be decrypted yet
+  const concurrencyConflicts = ref<Record<string, boolean>>({});
 
   const settingsStore = useSettingsStore();
 
@@ -169,6 +170,18 @@ export const useNotesStore = defineStore('notes', () => {
     if (!hasChanges) {
       return;
     }
+
+    // Optimistic Concurrency Check
+    const dbNote = await db.notes.get(id);
+    if (dbNote && dbNote.updatedAt > note.updatedAt) {
+      concurrencyConflicts.value[id] = true;
+      // Keep local in-memory edits so they can be recovered/overwritten
+      notes.value[index] = {
+        ...note,
+        ...updates
+      };
+      throw new Error('CONCURRENCY_CONFLICT');
+    }
     
     // Automatically extract tags if content is updated
     if (updates.content !== undefined) {
@@ -290,10 +303,53 @@ export const useNotesStore = defineStore('notes', () => {
     await loadNotes();
   }
 
+  async function resolveConflict(id: string, action: 'overwrite' | 'discard') {
+    if (action === 'discard') {
+      const dbNote = await db.notes.get(id);
+      if (dbNote) {
+        const index = notes.value.findIndex(n => n.id === id);
+        if (index !== -1) {
+          if (dbNote.encryptedWith === 'vault' && settingsStore.encryptionKey) {
+            try {
+              const decryptedContent = await decryptText(
+                dbNote.content,
+                dbNote.iv || '',
+                settingsStore.encryptionKey
+              );
+              notes.value[index] = {
+                ...dbNote,
+                content: decryptedContent,
+              };
+            } catch (err) {
+              console.error('Failed to decrypt note during conflict resolution:', err);
+              notes.value[index] = dbNote;
+            }
+          } else {
+            notes.value[index] = dbNote;
+          }
+        }
+      }
+    } else if (action === 'overwrite') {
+      const dbNote = await db.notes.get(id);
+      const index = notes.value.findIndex(n => n.id === id);
+      if (index !== -1 && dbNote) {
+        // Force write: update our local copy's updatedAt to match the database version,
+        // so that the concurrency check passes, and then write.
+        notes.value[index].updatedAt = dbNote.updatedAt;
+        await saveNoteToDb(notes.value[index]);
+        // Also write current timestamp to mark our force write
+        notes.value[index].updatedAt = Date.now();
+        await db.notes.update(id, { updatedAt: notes.value[index].updatedAt });
+      }
+    }
+    delete concurrencyConflicts.value[id];
+  }
+
   return {
     notes,
     isLoading,
     lockedNotes,
+    concurrencyConflicts,
     allNotes,
     activeNotes,
     trashedNotes,
@@ -309,6 +365,7 @@ export const useNotesStore = defineStore('notes', () => {
     emptyTrash,
     purgeOldTrash,
     saveNoteToDb,
-    toggleEncryptionForAllNotes
+    toggleEncryptionForAllNotes,
+    resolveConflict
   };
 });

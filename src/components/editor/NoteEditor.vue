@@ -48,6 +48,22 @@
     <!-- Active Editor State -->
     <div v-else class="editor-active-container">
       <div class="editor-active">
+        <!-- Concurrency Conflict Banner -->
+        <div v-if="hasConflict" class="conflict-banner font-ui">
+          <div class="conflict-info">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="conflict-icon">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span>This note has been modified in another session. Please resolve the conflict.</span>
+          </div>
+          <div class="conflict-actions">
+            <button class="conflict-btn overwrite-btn" @click="resolveConflictOverwrite">Keep Local & Save</button>
+            <button class="conflict-btn discard-btn" @click="resolveConflictDiscard">Discard & Sync</button>
+          </div>
+        </div>
+
         <!-- Floating selection bubble toolbar -->
         <EditorToolbar :editor="editor" />
 
@@ -109,7 +125,7 @@ import { useNotesStore } from '@/stores/notes';
 import { useUiStore } from '@/stores/ui';
 import { useSettingsStore } from '@/stores/settings';
 import { useAutoSave } from '@/composables/useAutoSave';
-import { deriveKey, hexToBuf } from '@/lib/crypto';
+import { deriveKey, hexToBuf, resetDecryptionError } from '@/lib/crypto';
 
 // Subcomponents
 import EditorToolbar from './EditorToolbar.vue';
@@ -122,6 +138,35 @@ const autoSave = useAutoSave();
 
 const passphrase = ref('');
 const unlockError = ref(false);
+
+const hasConflict = computed(() => {
+  return noteId.value ? !!notesStore.concurrencyConflicts[noteId.value] : false;
+});
+
+async function resolveConflictOverwrite() {
+  if (!noteId.value) return;
+  try {
+    await notesStore.resolveConflict(noteId.value, 'overwrite');
+  } catch (err) {
+    console.error('Failed to resolve conflict with overwrite:', err);
+  }
+}
+
+async function resolveConflictDiscard() {
+  if (!noteId.value) return;
+  try {
+    await notesStore.resolveConflict(noteId.value, 'discard');
+    loadActiveNoteContent();
+  } catch (err) {
+    console.error('Failed to resolve conflict with discard:', err);
+  }
+}
+
+watch(hasConflict, (val) => {
+  if (editor.value) {
+    editor.value.setEditable(!isTrashed.value && !val, false);
+  }
+});
 
 const noteId = computed(() => {
   if (route.name === 'note-detail') {
@@ -327,8 +372,8 @@ function loadActiveNoteContent() {
     emitUpdate: false,
   });
 
-  // Set editable based on trash state
-  editor.value.setEditable(!isTrashed.value, false);
+  // Set editable based on trash state and conflict state
+  editor.value.setEditable(!isTrashed.value && !hasConflict.value, false);
 
   // Update counts
   const text = editor.value.getText();
@@ -433,6 +478,7 @@ async function unlockNote() {
   if (!code || !settingsStore.encryptionSalt) return;
 
   try {
+    resetDecryptionError();
     const saltBytes = hexToBuf(settingsStore.encryptionSalt);
     const key = await deriveKey(code, saltBytes);
 
@@ -447,10 +493,12 @@ async function unlockNote() {
       passphrase.value = '';
     } else {
       unlockError.value = true;
+      resetDecryptionError();
     }
   } catch (err) {
     console.error('Decryption fail:', err);
     unlockError.value = true;
+    resetDecryptionError();
   }
 }
 
@@ -764,5 +812,81 @@ onBeforeUnmount(async () => {
 .focus-mode .editor-empty,
 .focus-mode .editor-locked {
   display: none;
+}
+
+/* Conflict Banner */
+.conflict-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 10px var(--space-lg);
+  background: var(--accent-subtle);
+  border-bottom: 1px solid var(--accent);
+  color: var(--text-primary);
+  font-size: 12px;
+  animation: slideDown var(--duration-base) var(--ease-out);
+}
+
+.conflict-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  line-height: 1.4;
+}
+
+.conflict-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.conflict-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.conflict-btn {
+  height: 28px;
+  padding: 0 var(--space-sm);
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overwrite-btn {
+  background: var(--accent);
+  color: var(--bg-elevated);
+  border: none;
+}
+
+.overwrite-btn:hover {
+  opacity: 0.9;
+}
+
+.discard-btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.discard-btn:hover {
+  background: var(--bg-sunken);
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 </style>
