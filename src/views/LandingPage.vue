@@ -16,7 +16,7 @@
         <div class="header-right">
           <nav class="nav-links">
             <router-link to="/docs">Docs</router-link>
-            <a :href="downloadUrl">Download</a>
+            <a href="#" @click.prevent="triggerDownload(downloadUrl)">Download</a>
             <a href="https://github.com/fujiDevv/aethernotes" target="_blank" rel="noopener">GitHub</a>
             <router-link to="/note" class="cta-btn">Launch App →</router-link>
           </nav>
@@ -45,7 +45,7 @@
       <div v-if="mobileMenuOpen" class="mobile-drawer font-ui">
         <nav class="mobile-nav">
           <router-link to="/docs" @click="mobileMenuOpen = false">Docs</router-link>
-          <a :href="downloadUrl" @click="mobileMenuOpen = false">Download App</a>
+          <a href="#" @click.prevent="mobileMenuOpen = false; triggerDownload(downloadUrl)">Download App</a>
           <a href="https://github.com/fujiDevv/aethernotes" target="_blank" rel="noopener"
             @click="mobileMenuOpen = false">GitHub</a>
           <router-link to="/note" class="mobile-cta-btn" @click="mobileMenuOpen = false">Launch App →</router-link>
@@ -67,7 +67,7 @@
         </p>
         <div class="hero-ctas font-ui">
           <!-- <router-link to="/note" class="hero-btn primary">Launch Web App →</router-link> -->
-          <a :href="downloadUrl" class="hero-btn download-btn">
+          <a href="#" class="hero-btn download-btn" @click.prevent="triggerDownload(downloadUrl)">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -80,13 +80,13 @@
         </div>
         <div class="platform-downloads font-ui">
           <!-- <span>Available on: </span -->
-          <a href="https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_aarch64.dmg">macOS
+          <a href="#" @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_aarch64.dmg')">macOS
             (Apple Silicon)</a> ·
-          <a href="https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.dmg">macOS
+          <a href="#" @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.dmg')">macOS
             (Intel)</a> ·
-          <a href="https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64_en-US.msi">Windows
+          <a href="#" @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64_en-US.msi')">Windows
             (.msi)</a> ·
-          <a href="https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.AppImage">Linux
+          <a href="#" @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.AppImage')">Linux
             (.AppImage)</a>
         </div>
 
@@ -201,6 +201,30 @@
         </div>
       </div>
     </section>
+
+    <!-- Download Warning Modal Overlay -->
+    <Transition name="fade">
+      <div v-if="showDownloadWarning" class="warning-modal-overlay" @click.self="showDownloadWarning = false">
+        <div class="warning-modal">
+          <div class="warning-modal-header">
+            <svg xmlns="http://www.w3.org/2000/svg" class="warning-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <h3 class="warning-title font-display">Security &amp; Installation Notice</h3>
+          </div>
+          <div class="warning-modal-body font-ui">
+            <p>Aether Notes is a free, open-source project. Because our installers are self-signed, your operating system may warn you that the developer is unverified during installation.</p>
+            <p style="margin-top: 12px;"><strong>macOS:</strong> Right-click the app in Applications and click <strong>Open</strong> to bypass Gatekeeper.<br/><strong>Windows:</strong> Click <strong>More info</strong> and select <strong>Run anyway</strong> on the SmartScreen prompt.</p>
+          </div>
+          <div class="warning-modal-footer font-ui">
+            <button class="btn-cancel" @click="showDownloadWarning = false">Cancel</button>
+            <a :href="pendingDownloadUrl" class="btn-confirm" @click="showDownloadWarning = false" target="_blank">Download Anyway</a>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -210,6 +234,14 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 const mobileMenuOpen = ref(false);
 function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value;
+}
+
+const showDownloadWarning = ref(false);
+const pendingDownloadUrl = ref('');
+
+function triggerDownload(url: string) {
+  pendingDownloadUrl.value = url;
+  showDownloadWarning.value = true;
 }
 
 const downloadUrl = computed(() => {
@@ -1010,5 +1042,152 @@ onUnmounted(() => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ── Warning Modal ── */
+.warning-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+}
+
+.warning-modal {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: modalScaleUp 0.25s var(--ease-out);
+}
+
+@keyframes modalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.warning-modal-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-lg) var(--space-sm);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.warning-icon {
+  color: #D9730D;
+  flex-shrink: 0;
+}
+
+.warning-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.warning-modal-body {
+  padding: var(--space-lg);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.warning-modal-body p {
+  margin: 0 0 var(--space-md);
+}
+
+.platform-instructions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.platform-instruction-box {
+  background: var(--bg-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+}
+
+.platform-instruction-box strong {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.platform-instruction-box p {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.warning-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-sunken);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.btn-cancel:hover {
+  background: var(--bg);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.btn-confirm {
+  text-decoration: none;
+  background: var(--text-primary);
+  color: var(--bg);
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-confirm:hover {
+  opacity: 0.9;
 }
 </style>
