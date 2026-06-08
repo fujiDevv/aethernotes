@@ -80,13 +80,17 @@
         </div>
         <div class="platform-downloads font-ui">
           <!-- <span>Available on: </span -->
-          <a href="#" @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_aarch64.dmg')">macOS
+          <a href="#"
+            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_aarch64.dmg')">macOS
             (Apple Silicon)</a> ·
-          <a href="#" @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.dmg')">macOS
+          <a href="#"
+            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.dmg')">macOS
             (Intel)</a> ·
-          <a href="#" @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64_en-US.msi')">Windows
+          <a href="#"
+            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64_en-US.msi')">Windows
             (.msi)</a> ·
-          <a href="#" @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.AppImage')">Linux
+          <a href="#"
+            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.AppImage')">Linux
             (.AppImage)</a>
         </div>
 
@@ -207,20 +211,29 @@
       <div v-if="showDownloadWarning" class="warning-modal-overlay" @click.self="showDownloadWarning = false">
         <div class="warning-modal">
           <div class="warning-modal-header">
-            <svg xmlns="http://www.w3.org/2000/svg" class="warning-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            <svg xmlns="http://www.w3.org/2000/svg" class="warning-icon" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
             <h3 class="warning-title font-display">Security &amp; Installation Notice</h3>
           </div>
           <div class="warning-modal-body font-ui">
-            <p>Aether Notes is a free, open-source project. Because our installers are self-signed, your operating system may warn you that the developer is unverified during installation.</p>
-            <p style="margin-top: 12px;"><strong>macOS:</strong> Right-click the app in Applications and click <strong>Open</strong> to bypass Gatekeeper.<br/><strong>Windows:</strong> Click <strong>More info</strong> and select <strong>Run anyway</strong> on the SmartScreen prompt.</p>
+            <p>Aether Notes is a free, open-source project. Because our installers are self-signed, your operating
+              system
+              may warn you that the developer is unverified during installation.</p>
+            <p style="margin-top: 12px;"><strong>macOS:</strong> Right-click the app in Applications and click
+              <strong>Open</strong> to bypass Gatekeeper.<br /><strong>Windows:</strong> Click <strong>More
+                info</strong>
+              and select <strong>Run anyway</strong> on the SmartScreen prompt.
+            </p>
           </div>
           <div class="warning-modal-footer font-ui">
             <button class="btn-cancel" @click="showDownloadWarning = false">Cancel</button>
-            <a :href="pendingDownloadUrl" class="btn-confirm" @click="showDownloadWarning = false" target="_blank">Download Anyway</a>
+            <a :href="pendingDownloadUrl" class="btn-confirm" @click="showDownloadWarning = false"
+              target="_blank">Download
+              Anyway</a>
           </div>
         </div>
       </div>
@@ -422,7 +435,7 @@ onUnmounted(() => {
   right: 0;
   height: var(--topbar-height);
   /* background-color: transparent; */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  /* border-bottom: 1px solid rgba(0, 0, 0, 0.05); */
   z-index: 1000;
   /* backdrop-filter: blur(12px); */
   /* -webkit-backdrop-filter: blur(12px); */
@@ -1077,6 +1090,7 @@ onUnmounted(() => {
     opacity: 0;
     transform: scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
