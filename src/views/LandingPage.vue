@@ -17,7 +17,7 @@
           <nav class="nav-links">
             <router-link to="/docs">Docs</router-link>
             <a :href="downloadUrl">Download</a>
-            <a href="https://github.com/joshuasarmiento/aethernotes" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/fujiDevv/aethernotes" target="_blank" rel="noopener">GitHub</a>
             <router-link to="/note" class="cta-btn">Launch App →</router-link>
           </nav>
 
@@ -44,11 +44,9 @@
     <Transition name="slide-down">
       <div v-if="mobileMenuOpen" class="mobile-drawer font-ui">
         <nav class="mobile-nav">
-          <router-link to="/docs#editor" @click="mobileMenuOpen = false">Features</router-link>
-          <router-link to="/docs#security" @click="mobileMenuOpen = false">Security</router-link>
           <router-link to="/docs" @click="mobileMenuOpen = false">Docs</router-link>
           <a :href="downloadUrl" @click="mobileMenuOpen = false">Download App</a>
-          <a href="https://github.com/joshuasarmiento/aethernotes" target="_blank" rel="noopener"
+          <a href="https://github.com/fujiDevv/aethernotes" target="_blank" rel="noopener"
             @click="mobileMenuOpen = false">GitHub</a>
           <router-link to="/note" class="mobile-cta-btn" @click="mobileMenuOpen = false">Launch App →</router-link>
         </nav>
@@ -64,7 +62,8 @@
           <span class="italic-accent">fully yours.</span>
         </h1>
         <p class="hero-subtitle font-ui">
-          A native desktop Markdown notes editor powered by Tauri v2. Secure your notes with zero-knowledge AES-256-GCM encryption, while storing everything locally in raw Markdown files on your device.
+          A native desktop Markdown notes editor powered by Tauri v2. Secure your notes with zero-knowledge AES-256-GCM
+          encryption, while storing everything locally in raw Markdown files on your device.
         </p>
         <div class="hero-ctas font-ui">
           <!-- <router-link to="/note" class="hero-btn primary">Launch Web App →</router-link> -->
@@ -215,14 +214,14 @@ function toggleMobileMenu() {
 
 const downloadUrl = computed(() => {
   const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent.toLowerCase() : '';
-  const githubRepo = 'https://github.com/joshuasarmiento/aethernotes';
+  const githubRepo = 'https://github.com/fujiDevv/aethernotes';
 
   if (userAgent.indexOf('win') !== -1) {
-    return `${githubRepo}/releases/latest/download/Aether-Notes_x64_en-US.msi`;
+    return `${githubRepo}/releases/download/v1.0.0/Aether.Notes_0.1.0_x64_en-US.msi`;
   } else if (userAgent.indexOf('mac') !== -1) {
-    return `${githubRepo}/releases/latest/download/Aether-Notes_aarch64.dmg`;
+    return `${githubRepo}/releases/download/v1.0.0/Aether.Notes_0.1.0_aarch64.dmg`;
   } else if (userAgent.indexOf('linux') !== -1) {
-    return `${githubRepo}/releases/latest/download/Aether-Notes.AppImage`;
+    return `${githubRepo}/releases/download/v1.0.0/Aether.Notes_0.1.0_amd64.AppImage`;
   }
   return `${githubRepo}/releases/latest`;
 });
