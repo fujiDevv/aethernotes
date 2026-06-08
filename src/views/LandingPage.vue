@@ -81,16 +81,16 @@
         <div class="platform-downloads font-ui">
           <!-- <span>Available on: </span -->
           <a href="#"
-            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_aarch64.dmg')">macOS
+            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_1.0.0_aarch64.dmg')">macOS
             (Apple Silicon)</a> ·
           <a href="#"
-            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.dmg')">macOS
+            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_1.0.0_x64.dmg')">macOS
             (Intel)</a> ·
           <a href="#"
-            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64_en-US.msi')">Windows
+            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_1.0.0_x64_en-US.msi')">Windows
             (.msi)</a> ·
           <a href="#"
-            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.AppImage')">Linux
+            @click.prevent="triggerDownload('https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_1.0.0_x64.AppImage')">Linux
             (.AppImage)</a>
         </div>
 
@@ -262,11 +262,11 @@ const downloadUrl = computed(() => {
   const githubRepo = 'https://github.com/fujiDevv/aethernotes';
 
   if (userAgent.indexOf('win') !== -1) {
-    return `${githubRepo}/releases/download/v1.0.0/Aether.Notes_0.1.0_x64_en-US.msi`;
+    return `${githubRepo}/releases/download/v1.0.0/Aether.Notes_1.0.0_x64_en-US.msi`;
   } else if (userAgent.indexOf('mac') !== -1) {
-    return `${githubRepo}/releases/download/v1.0.0/Aether.Notes_0.1.0_aarch64.dmg`;
+    return `${githubRepo}/releases/download/v1.0.0/Aether.Notes_1.0.0_aarch64.dmg`;
   } else if (userAgent.indexOf('linux') !== -1) {
-    return `${githubRepo}/releases/download/v1.0.0/Aether.Notes_0.1.0_amd64.AppImage`;
+    return `${githubRepo}/releases/download/v1.0.0/Aether.Notes_1.0.0_amd64.AppImage`;
   }
   return `${githubRepo}/releases/latest`;
 });
