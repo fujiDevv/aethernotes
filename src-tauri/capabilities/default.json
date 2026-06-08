@@ -7,13 +7,25 @@
   ],
   "permissions": [
     "core:default",
-    "fs:default",
+    "fs:allow-read-text-file",
+    "fs:allow-write-text-file",
+    "fs:allow-exists",
+    "fs:allow-mkdir",
+    "fs:allow-remove",
+    "fs:allow-rename",
+    "fs:allow-read-dir",
     {
       "identifier": "fs:scope",
       "allow": [
         { "path": "$DOCUMENT" },
         { "path": "$DOCUMENT/*" },
-        { "path": "$DOCUMENT/**/*" }
+        { "path": "$DOCUMENT/**/*" },
+        { "path": "$DOCUMENT/Aether Notes" },
+        { "path": "$DOCUMENT/Aether Notes/*" },
+        { "path": "$DOCUMENT/Aether Notes/**/*" },
+        { "path": "$DOCUMENT/Aether Notes/.aether-settings.json" },
+        { "path": "$DOCUMENT/Aether Notes/.*" },
+        { "path": "$DOCUMENT/Aether Notes/**/.*" }
       ]
     }
   ]
