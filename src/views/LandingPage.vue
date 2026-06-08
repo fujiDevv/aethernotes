@@ -58,17 +58,16 @@
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-container">
-        <div class="hero-badge font-ui">Open source · Local-first</div>
+        <div class="hero-badge font-ui">Open Source · Native Desktop · Local-First</div>
         <h1 class="hero-title font-display">
           Your thoughts,<br />
           <span class="italic-accent">fully yours.</span>
         </h1>
         <p class="hero-subtitle font-ui">
-          A minimal local-first notes editor secured with zero-knowledge AES-256-GCM encryption. Run entirely
-          client-side with no accounts, no trackers, and complete offline capability.
+          A native desktop Markdown notes editor powered by Tauri v2. Secure your notes with zero-knowledge AES-256-GCM encryption, while storing everything locally in raw Markdown files on your device.
         </p>
         <div class="hero-ctas font-ui">
-          <router-link to="/note" class="hero-btn primary">Launch Web App →</router-link>
+          <!-- <router-link to="/note" class="hero-btn primary">Launch Web App →</router-link> -->
           <a :href="downloadUrl" class="hero-btn download-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -82,13 +81,13 @@
         </div>
         <div class="platform-downloads font-ui">
           <!-- <span>Available on: </span -->
-          <a href="https://github.com/joshuasarmiento/aethernotes/releases/latest/download/Aether-Notes_aarch64.dmg">macOS
+          <a href="https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_aarch64.dmg">macOS
             (Apple Silicon)</a> ·
-          <a href="https://github.com/joshuasarmiento/aethernotes/releases/latest/download/Aether-Notes_x64.dmg">macOS
+          <a href="https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.dmg">macOS
             (Intel)</a> ·
-          <a href="https://github.com/joshuasarmiento/aethernotes/releases/latest/download/Aether-Notes_x64_en-US.msi">Windows
+          <a href="https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64_en-US.msi">Windows
             (.msi)</a> ·
-          <a href="https://github.com/joshuasarmiento/aethernotes/releases/latest/download/Aether-Notes.AppImage">Linux
+          <a href="https://github.com/fujiDevv/aethernotes/releases/download/v1.0.0/Aether.Notes_0.1.0_x64.AppImage">Linux
             (.AppImage)</a>
         </div>
 
@@ -372,7 +371,7 @@ onUnmounted(() => {
   --sidebar-hover: #FFFFFF;
   --hover-bg: #F1F1EF;
 
-  background-image: url('@/assets/AI_Bg_05.jpg');
+  background-image: url('@/assets/bg-01.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

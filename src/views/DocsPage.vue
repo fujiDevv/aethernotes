@@ -74,50 +74,434 @@
       <!-- Main Content -->
       <main class="docs-content">
 
-        <!-- Blueprint -->
-        <section id="blueprint" class="doc-section">
-          <h1 class="doc-h1 font-display">Architectural Blueprint & Design Strategy</h1>
-          <p class="doc-p">When decoupling a PWA framework to build a downloadable binary for Windows, Linux, and macOS, selecting the correct container runtime directly influences compilation sizes and application memory footprints.</p>
+        <!-- Introduction -->
+        <section id="introduction" class="doc-section">
+          <h1 class="doc-h1 font-display">Aether Notes Documentation</h1>
+          <p class="doc-p">Welcome to Aether Notes — a privacy-first, local-first, native markdown editor built for speed, security, and complete data ownership. Your notes are saved locally on your computer as plain text files, putting you in full control of your digital workspace.</p>
           
-          <h3 class="doc-h3">1.1 Technology Evaluation: Tauri vs. Electron</h3>
+          <div class="doc-callout info">
+            <strong>Privacy &amp; Ownership:</strong> Aether Notes does not store your notes in the cloud, require any online account, or track your activity. Your data is stored entirely on your own device.
+          </div>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Installation -->
+        <section id="installation" class="doc-section">
+          <h2 class="doc-h2 font-display">Installation &amp; Launch</h2>
+          <p class="doc-p">Aether Notes is available as a native desktop application across major operating systems. Download the latest installer from the official release repository.</p>
+          
+          <h3 class="doc-h3">macOS (Apple Silicon &amp; Intel)</h3>
+          <div class="doc-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <strong>Download the Disk Image (.dmg)</strong>
+                <p>Choose the version matching your processor: Apple Silicon (M1/M2/M3) or Intel.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <strong>Install the App</strong>
+                <p>Double-click the downloaded `.dmg` file and drag <strong>Aether Notes</strong> into your Applications folder.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <strong>Launch</strong>
+                <p>Open the app from Applications. On first launch, macOS might require you to allow the app through System Settings > Privacy &amp; Security.</p>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="doc-h3">Windows</h3>
+          <div class="doc-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <strong>Download the MSI Installer</strong>
+                <p>Retrieve the `.msi` setup file for Windows (x64).</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <strong>Run Installation</strong>
+                <p>Double-click the installer and follow the setup wizard prompts to install the application.</p>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="doc-h3">Linux</h3>
+          <div class="doc-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <strong>Download the AppImage</strong>
+                <p>Fetch the portable `.AppImage` binary.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <strong>Make it Executable</strong>
+                <p>Right-click the `.AppImage` file, open Properties, and enable the executable permission (or run <code class="inline-code">chmod +x Aether-Notes.AppImage</code> in terminal).</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <strong>Run the App</strong>
+                <p>Double-click the file to launch the application instantly.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Storage Location -->
+        <section id="storage-location" class="doc-section">
+          <h2 class="doc-h2 font-display">Where Notes Are Saved</h2>
+          <p class="doc-p">Unlike cloud-based note editors, Aether Notes writes your notes directly to your local drive. This ensures that you can access, edit, and back up your notes even if you stop using the application.</p>
+          
+          <h3 class="doc-h3">Notes Directory</h3>
+          <p class="doc-p">On desktop, your notes folder is created inside your system's Documents folder:</p>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>Path</span>
+            </div>
+            <pre class="code-body"><code>~/Documents/Aether Notes/</code></pre>
+          </div>
+
+          <h3 class="doc-h3">Note Portability &amp; Syncing</h3>
+          <ul class="doc-list">
+            <li><strong>Raw Markdown:</strong> Every note is a plain-text <code class="inline-code">.md</code> file. You can open and edit them using any markdown editor (like Obsidian, VS Code, or TextEdit).</li>
+            <li><strong>Folder Hierarchy:</strong> Folders and subfolders in the application directly correspond to folders on your computer's filesystem.</li>
+            <li><strong>Backup &amp; Sync:</strong> Since notes are standard files on disk, you can back them up or sync them across devices using tools like iCloud, OneDrive, Dropbox, or Git.</li>
+          </ul>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Markdown Editor -->
+        <section id="rich-editor" class="doc-section">
+          <h2 class="doc-h2 font-display">Features: Markdown Editor</h2>
+          <p class="doc-p">Aether Notes provides a distraction-free, rich markdown editor with immediate live rendering and flexible formatting tools.</p>
+          
+          <h3 class="doc-h3">Slash Commands</h3>
+          <p class="doc-p">Type <kbd>/</kbd> on a new line to access a quick-action block insertion menu. From here, you can quickly insert:</p>
+          <ul class="doc-list">
+            <li>Headings (H1, H2, H3)</li>
+            <li>Bullet and numbered lists</li>
+            <li>Task lists/checkboxes</li>
+            <li>Code blocks and quotes</li>
+          </ul>
+
+          <h3 class="doc-h3">Formatting Bubble Menu</h3>
+          <p class="doc-p">Simply select any text within the editor to summon the formatting bubble menu. It allows you to quickly apply bold, italic, strikethrough, inline code, or link formatting directly to the selection.</p>
+
+          <h3 class="doc-h3">Live Document Outline</h3>
+          <p class="doc-p">A collapsible table of contents (outline) is displayed alongside the note. Click on any heading in the outline to instantly jump to that section of your document.</p>
+
+          <h3 class="doc-h3">Inline Hashtags</h3>
+          <p class="doc-p">Organize your notes dynamically by adding tags. Type a hashtag (e.g. <code class="inline-code">#ideas</code>) inside your note body, or add tags in the tag bar at the bottom of the editor window. Tags are indexed for fast searching.</p>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Vault & Encryption -->
+        <section id="vault-security" class="doc-section">
+          <h2 class="doc-h2 font-display">Features: Vault &amp; Encryption</h2>
+          <p class="doc-p">Protect sensitive thoughts, passwords, and journals with professional, military-grade client-side encryption.</p>
+
+          <h3 class="doc-h3">AES-256-GCM Zero-Knowledge Model</h3>
+          <p class="doc-p">When you set up an encryption vault, the application uses the AES-256-GCM algorithm via the Web Crypto API to secure individual notes. Your master passphrase is run through a key derivation function (PBKDF2) to unlock notes temporarily in memory.</p>
+
+          <div class="doc-callout warning">
+            <strong>CRITICAL WARNING:</strong> Since your master passphrase is never stored on disk, sent online, or saved anywhere, there is <strong>no password recovery option</strong>. If you forget your passphrase, all notes inside your vault will remain locked permanently.
+          </div>
+          
+          <h3 class="doc-h3">Decrypted in Memory</h3>
+          <p class="doc-p">Encrypted notes are saved to disk with their title and metadata visible (stored in the note header frontmatter), but the entire body is replaced with ciphertext. Unlocking a note decrypts it only inside memory; it is never saved in raw plaintext format back to your disk while encrypted.</p>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Folders & Tags -->
+        <section id="file-org" class="doc-section">
+          <h2 class="doc-h2 font-display">Features: Folders &amp; Tags</h2>
+          <p class="doc-p">Keep your thoughts organized with custom structures, favorites, and dynamic tag indexing.</p>
+
+          <h3 class="doc-h3">Hierarchical Folders</h3>
+          <p class="doc-p">Create nested folders to organize your notes. Drag and drop folders or notes in the sidebar to reorder them. Any changes you make in the UI are automatically reflected in the filesystem folder structure.</p>
+
+          <h3 class="doc-h3">Favorites &amp; Pinned Notes</h3>
+          <ul class="doc-list">
+            <li><strong>Pins:</strong> Pin critical notes to the top of note lists for immediate access.</li>
+            <li><strong>Favorites:</strong> Add notes to your Favorites group to access them from the sidebar shortcuts index.</li>
+          </ul>
+
+          <h3 class="doc-h3">Trash Bin</h3>
+          <p class="doc-p">Deleting a note moves it to the Trash bin. Notes in the trash are excluded from search results and can be restored at any time. Empty the trash to permanently delete notes from your disk.</p>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Command Palette -->
+        <section id="command-palette" class="doc-section">
+          <h2 class="doc-h2 font-display">Features: Command Palette</h2>
+          <p class="doc-p">Navigate your notes, folders, and settings entirely using your keyboard via a powerful fuzzy search console.</p>
+
+          <h3 class="doc-h3">Quick Access Console</h3>
+          <p class="doc-p">Press <kbd>Cmd+K</kbd> (macOS) or <kbd>Ctrl+K</kbd> (Windows/Linux) from anywhere in the application to activate the Command Palette.</p>
+          <ul class="doc-list">
+            <li><strong>Fuzzy Search:</strong> Search through note titles, content, and folder names instantly.</li>
+            <li><strong>Quick Navigation:</strong> Press up/down arrows to browse results, and <kbd>Enter</kbd> to jump straight to the selected note or folder.</li>
+          </ul>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Creating Notes -->
+        <section id="create-notes" class="doc-section">
+          <h2 class="doc-h2 font-display">How to Use: Managing Notes</h2>
+          <p class="doc-p">A guide to basic note operations, formatting, and editor tools.</p>
+
+          <h3 class="doc-h3">Creating a Note</h3>
+          <div class="doc-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <strong>Click New Note</strong>
+                <p>Click the <strong>"+"</strong> button at the top of the note list panel, or use the global shortcut <kbd>Cmd+N</kbd> / <kbd>Ctrl+N</kbd>.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <strong>Enter Title</strong>
+                <p>Provide a title in the header field. The physical file will be named accordingly (e.g., "Untitled Note.md").</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <strong>Write Content</strong>
+                <p>Start writing. Use standard markdown or slash commands to style your text. Auto-save triggers automatically as you type.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Organizing Notes -->
+        <section id="organize-notes" class="doc-section">
+          <h2 class="doc-h2 font-display">How to Use: Organizing Notes</h2>
+          <p class="doc-p">Maintain structure using folders, tags, favorites, and pins.</p>
+
+          <h3 class="doc-h3">Setting Up Folders</h3>
+          <ul class="doc-list">
+            <li><strong>New Folder:</strong> Click the new folder icon on the sidebar, type a name, and press <kbd>Enter</kbd>.</li>
+            <li><strong>Nesting Folders:</strong> Drag a folder in the sidebar and drop it on top of another folder to make it a subfolder.</li>
+            <li><strong>Moving Notes:</strong> Drag a note from the note list panel and drop it into a folder in the sidebar.</li>
+          </ul>
+
+          <h3 class="doc-h3">Using Tags</h3>
+          <p class="doc-p">To tag a note, add a tag at the bottom of the editor screen by clicking <strong>Add Tag</strong>, or write hashtags directly in your document body. You can view and filter notes by tags in the sidebar panel.</p>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Encrypting Notes -->
+        <section id="encrypt-notes" class="doc-section">
+          <h2 class="doc-h2 font-display">How to Use: Encrypting Notes</h2>
+          <p class="doc-p">Secure sensitive notes in a local cryptographic vault.</p>
+
+          <h3 class="doc-h3">Initializing the Vault</h3>
+          <div class="doc-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <strong>Open Vault Settings</strong>
+                <p>Go to settings, and click on the **Encryption** tab.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <strong>Set Master Passphrase</strong>
+                <p>Choose a strong, memorable passphrase. Write it down safely elsewhere.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <strong>Confirm setup</strong>
+                <p>Your vault is now active. Locked notes will use this passphrase to decrypt.</p>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="doc-h3">Encrypting an Existing Note</h3>
+          <p class="doc-p">Open the note you want to secure, click the shield/lock icon in the editor toolbar, and select **Encrypt Note**. The note will instantly be encrypted on your local drive.</p>
+        </section>
+
+        <hr class="doc-divider" />
+
+        <!-- Keyboard Shortcuts -->
+        <section id="keyboard-shortcuts" class="doc-section">
+          <h2 class="doc-h2 font-display">Keyboard Shortcuts Reference</h2>
+          <p class="doc-p">Use these global keyboard shortcuts to speed up your note-taking workflow:</p>
+          
           <table class="doc-table">
             <thead>
               <tr>
-                <th>Metric</th>
-                <th>Tauri v2 (Recommended)</th>
-                <th>Electron / Chromium Containers</th>
+                <th>Action</th>
+                <th>macOS Shortcut</th>
+                <th>Windows/Linux Shortcut</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>Bundle Scale Optimization</strong></td>
-                <td><strong>~10–15 MB</strong><br>Uses native host OS webview (WebView2, WebKitGTK, or WKWebView).</td>
-                <td><strong>~80 MB+</strong><br>Bundles full autonomous Chromium + Node.js runtime.</td>
+                <td><strong>Create New Note</strong></td>
+                <td><kbd>Cmd + N</kbd></td>
+                <td><kbd>Ctrl + N</kbd></td>
               </tr>
               <tr>
-                <td><strong>Memory Isolation</strong></td>
-                <td><strong>Sandboxed Rust-based processing cycles</strong>;<br>lower application runtime footprint when idling.</td>
-                <td>Heavy, multi-threaded Chromium rendering pipelines.</td>
+                <td><strong>Toggle Sidebar</strong></td>
+                <td><kbd>Cmd + \</kbd></td>
+                <td><kbd>Ctrl + \</kbd></td>
               </tr>
               <tr>
-                <td><strong>System Protections</strong></td>
-                <td><strong>Default isolation of high-privilege APIs</strong>;<br>system calls funneled via Inter-Process Communication (IPC) boundary.</td>
-                <td>Direct access to Node.js APIs from frontend context by default (higher risk).</td>
+                <td><strong>Command Palette</strong></td>
+                <td><kbd>Cmd + K</kbd></td>
+                <td><kbd>Ctrl + K</kbd></td>
+              </tr>
+              <tr>
+                <td><strong>Toggle Dark/Light Theme</strong></td>
+                <td><kbd>Cmd + Shift + L</kbd></td>
+                <td><kbd>Ctrl + Shift + L</kbd></td>
+              </tr>
+              <tr>
+                <td><strong>Toggle Focus Mode</strong></td>
+                <td><kbd>Cmd + Shift + F</kbd></td>
+                <td><kbd>Ctrl + Shift + F</kbd></td>
+              </tr>
+              <tr>
+                <td><strong>Close Search / Palette</strong></td>
+                <td><kbd>Esc</kbd></td>
+                <td><kbd>Esc</kbd></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <div class="doc-callout info">
+          <strong>Developer &amp; Systems Reference:</strong> The sections below outline the core system architecture, development configurations, and deployment build pipelines. If you are not a developer contributing to Aether Notes, you can safely skip this part.
+        </div>
+
+        <hr class="doc-divider" />
+
+        <!-- Architecture -->
+        <section id="architecture" class="doc-section">
+          <h1 class="doc-h1 font-display">Architecture &amp; System Design</h1>
+          <p class="doc-p">Aether Notes is a native desktop application built with Tauri v2 and Vue 3. Notes are stored as raw Markdown files on the host filesystem — no cloud, no accounts, no vendor lock-in.</p>
+          
+          <h3 class="doc-h3">1.1 Why Tauri v2</h3>
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Tauri v2</th>
+                <th>Electron</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Bundle Size</strong></td>
+                <td><strong>~5–15 MB</strong><br>Uses native OS webview (WebView2, WebKitGTK, WKWebView).</td>
+                <td><strong>~80 MB+</strong><br>Bundles full Chromium + Node.js runtime.</td>
+              </tr>
+              <tr>
+                <td><strong>Memory Usage</strong></td>
+                <td><strong>Sandboxed Rust backend</strong>;<br>low idle footprint.</td>
+                <td>Multi-process Chromium architecture; higher baseline.</td>
+              </tr>
+              <tr>
+                <td><strong>Security Model</strong></td>
+                <td><strong>Capability-based permissions</strong>;<br>system calls gated via IPC boundary.</td>
+                <td>Direct Node.js API access from renderer by default.</td>
               </tr>
             </tbody>
           </table>
 
-          <h3 class="doc-h3">1.2 Desktop Storage Topology</h3>
-          <p class="doc-p">The database architecture uses a persistent storage boundary that targets either local raw Markdown files or IndexedDB fallback. When running inside the Tauri native desktop wrapper, storage persistence utilizes direct OS capabilities.</p>
+          <h3 class="doc-h3">1.2 Dual Storage Layer</h3>
+          <p class="doc-p">The application uses a <code class="inline-code">StorageLayer</code> interface that selects the appropriate backend at runtime. Both implementations are interchangeable and share the same API surface.</p>
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Environment</th>
+                <th>Backend</th>
+                <th>Data Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Tauri Desktop</strong></td>
+                <td><code class="inline-code">TauriFsStorageLayer</code></td>
+                <td><code class="inline-code">~/Documents/Aether Notes/</code></td>
+              </tr>
+              <tr>
+                <td><strong>Web Browser</strong></td>
+                <td><code class="inline-code">IndexedDbStorageLayer</code></td>
+                <td>Browser IndexedDB (via Dexie.js)</td>
+              </tr>
+            </tbody>
+          </table>
 
-          <div class="doc-callout info">
-            <strong>Option 1: Isolated Hybrid Mode</strong><br>
-            Retain the Dexie.js and IndexedDB engine configurations. Because Tauri's underlying WebView container handles data isolation at the application sandbox layer, database persistence maps directly to system disk space—fully bypassing browser history clearing behaviors or disk-eviction routines.
+          <h3 class="doc-h3">1.3 Note File Format</h3>
+          <p class="doc-p">In native mode, each note is a <code class="inline-code">.md</code> file with YAML frontmatter for metadata. This makes notes fully portable and editable in any text editor.</p>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>Example: My Note.md</span>
+              <button class="copy-btn" @click="copyText(frontmatterSnippet)">{{ copied === frontmatterSnippet ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>{{ frontmatterSnippet }}</code></pre>
           </div>
+          <ul class="doc-list">
+            <li><strong>Folders</strong> map directly to subdirectories on disk.</li>
+            <li><strong>Metadata</strong> (ID, tags, pins, timestamps) is serialized in the frontmatter header.</li>
+            <li><strong>Encrypted notes</strong> store ciphertext in the body with <code class="inline-code">encryptedWith</code> and <code class="inline-code">iv</code> fields in frontmatter.</li>
+          </ul>
+        </section>
 
-          <div class="doc-callout warning">
-            <strong>Option 2: Native File System Binding (Raw Markdown Integration)</strong><br>
-            Replace the browser abstraction layer entirely by leveraging Tauri's high-privileged file-system plugin system. This enables user-defined directory streaming, allowing the system to securely parse, decrypt, and save changes into raw, localized <code class="inline-code">.md</code> files on the host computer.
+        <hr class="doc-divider" />
+
+        <!-- Security -->
+        <section id="security" class="doc-section">
+          <h2 class="doc-h2 font-display">Security Model</h2>
+          <p class="doc-p">Aether Notes implements a zero-knowledge encryption architecture. No data ever leaves your machine.</p>
+
+          <h3 class="doc-h3">2.1 Encryption</h3>
+          <ul class="doc-list">
+            <li><strong>Algorithm:</strong> AES-256-GCM via the native Web Crypto API.</li>
+            <li><strong>Key Derivation:</strong> PBKDF2 with 100,000 iterations from a user-provided passphrase.</li>
+            <li><strong>Zero-Knowledge:</strong> The decryption key exists only in memory and is never written to disk.</li>
+            <li><strong>Passphrase Rotation:</strong> Re-encrypts all vault notes in a single batch when changed.</li>
+          </ul>
+
+          <h3 class="doc-h3">2.2 Tauri Capability Scoping</h3>
+          <p class="doc-p">Filesystem access is explicitly scoped via <code class="inline-code">src-tauri/capabilities/default.json</code>. The app can only read/write within the <code class="inline-code">$DOCUMENT/Aether Notes</code> directory — no access to other parts of the filesystem.</p>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>capabilities/default.json (excerpt)</span>
+              <button class="copy-btn" @click="copyText(capabilitiesSnippet)">{{ copied === capabilitiesSnippet ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>{{ capabilitiesSnippet }}</code></pre>
           </div>
         </section>
 
@@ -125,19 +509,38 @@
 
         <!-- Prerequisites -->
         <section id="prerequisites" class="doc-section">
-          <h2 class="doc-h2 font-display">Infrastructure Prerequisites</h2>
-          <p class="doc-p">To compile the underlying Rust application layer into platform-native installation packages, developers' environments must fulfill the compilation toolchain dependencies listed below:</p>
+          <h2 class="doc-h2 font-display">Development Prerequisites</h2>
+          <p class="doc-p">To build and develop Aether Notes locally, you need the following tools installed.</p>
 
-          <h3 class="doc-h3">2.1 Microsoft Windows Environments</h3>
-          <ul class="doc-list">
-            <li><strong>Compilation Engine:</strong> Install the standard Microsoft Visual Studio Build Tools suite, ensuring the <strong>Desktop Development with C++</strong> package is explicitly enabled.</li>
-            <li><strong>Rendering Component:</strong> Ensure the Microsoft WebView2 Runtime environment is present (provisioned automatically inside default Windows 10/11 system layers).</li>
-          </ul>
+          <h3 class="doc-h3">3.1 All Platforms</h3>
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Tool</th>
+                <th>Version</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Node.js</strong></td>
+                <td>v18+</td>
+                <td>JavaScript runtime</td>
+              </tr>
+              <tr>
+                <td><strong>Bun</strong> or npm</td>
+                <td>latest</td>
+                <td>Package manager</td>
+              </tr>
+              <tr>
+                <td><strong>Rust</strong></td>
+                <td>stable</td>
+                <td>Tauri backend compilation</td>
+              </tr>
+            </tbody>
+          </table>
 
-          <h3 class="doc-h3">2.2 Apple macOS Environments</h3>
-          <ul class="doc-list">
-            <li><strong>Compilation Engine:</strong> Command-line development compilation tools must be provisioned via the terminal:</li>
-          </ul>
+          <h3 class="doc-h3">3.2 macOS</h3>
           <div class="doc-code-block">
             <div class="code-header">
               <span>Terminal</span>
@@ -146,139 +549,215 @@
             <pre class="code-body"><code>xcode-select --install</code></pre>
           </div>
 
-          <h3 class="doc-h3">2.3 GNU/Linux Environments (Debian/Ubuntu Core)</h3>
-          <ul class="doc-list">
-            <li><strong>System Dependencies:</strong> Execute system package synchronizations to install the modern WebKit libraries, rendering toolchains, and visual target compilation tools required for the WebKitGTK platform backend:</li>
-          </ul>
+          <h3 class="doc-h3">3.3 Linux (Debian/Ubuntu)</h3>
           <div class="doc-code-block">
             <div class="code-header">
               <span>Terminal</span>
-              <button class="copy-btn" @click="copyText('sudo apt update && sudo apt install -y curl wget build-essential libssl-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev')">{{ copied === 'sudo apt update && sudo apt install -y curl wget build-essential libssl-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev' ? 'Copied!' : 'Copy' }}</button>
+              <button class="copy-btn" @click="copyText(linuxDepsCmd)">{{ copied === linuxDepsCmd ? 'Copied!' : 'Copy' }}</button>
             </div>
-            <pre class="code-body"><code>sudo apt update
-sudo apt install -y curl wget build-essential libssl-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev</code></pre>
+            <pre class="code-body"><code>{{ linuxDepsCmd }}</code></pre>
           </div>
+
+          <h3 class="doc-h3">3.4 Windows</h3>
+          <ul class="doc-list">
+            <li><strong>Visual Studio Build Tools</strong> with the <strong>Desktop Development with C++</strong> workload enabled.</li>
+            <li><strong>WebView2 Runtime</strong> — pre-installed on Windows 10/11.</li>
+          </ul>
         </section>
 
         <hr class="doc-divider" />
 
-        <!-- Migration Steps -->
-        <section id="migration-steps" class="doc-section">
-          <h2 class="doc-h2 font-display">Step-by-Step Implementation</h2>
-          <p class="doc-p">Follow these systematic steps to migrate from Progressive Web App (PWA) configurations to native Tauri packaging.</p>
+        <!-- Development -->
+        <section id="dev-pipeline" class="doc-section">
+          <h2 class="doc-h2 font-display">Development &amp; Build</h2>
+          <p class="doc-p">Clone the repository and install dependencies to get started.</p>
 
-          <h3 class="doc-h3">Step 3.1: Package Initializations</h3>
-          <p class="doc-p">Initialize the internal native compilation manifest file inside the absolute root directory of your project folder using <code class="inline-code">bun</code>:</p>
+          <h3 class="doc-h3">4.1 Setup</h3>
           <div class="doc-code-block">
             <div class="code-header">
               <span>Terminal</span>
-              <button class="copy-btn" @click="copyText('bun add -d @tauri-apps/cli@latest && bun tauri init')">{{ copied === 'bun add -d @tauri-apps/cli@latest && bun tauri init' ? 'Copied!' : 'Copy' }}</button>
+              <button class="copy-btn" @click="copyText(setupCmd)">{{ copied === setupCmd ? 'Copied!' : 'Copy' }}</button>
             </div>
-            <pre class="code-body"><code>bun add -d @tauri-apps/cli@latest
-bun tauri init</code></pre>
+            <pre class="code-body"><code>{{ setupCmd }}</code></pre>
           </div>
-          <p class="doc-p">When prompted by the configuration wizard, inject the target operational values defined below:</p>
+
+          <h3 class="doc-h3">4.2 Development Modes</h3>
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Command</th>
+                <th>Mode</th>
+                <th>Storage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code class="inline-code">npm run dev</code></td>
+                <td>Web-only (browser)</td>
+                <td>IndexedDB</td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">npx tauri dev</code></td>
+                <td>Native desktop</td>
+                <td>Filesystem (.md files)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 class="doc-h3">4.3 Testing</h3>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" @click="copyText('npm run test')">{{ copied === 'npm run test' ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>npm run test</code></pre>
+          </div>
+          <p class="doc-p">Runs Vitest unit tests covering crypto key derivation, store integration, and encryption/decryption round-trips.</p>
+
+          <h3 class="doc-h3">4.4 Production Build</h3>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" @click="copyText('npx tauri build')">{{ copied === 'npx tauri build' ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>npx tauri build</code></pre>
+          </div>
+          <p class="doc-p">Generates platform-specific installers in <code class="inline-code">src-tauri/target/release/bundle/</code>:</p>
           <ul class="doc-list">
-            <li><strong>App Name:</strong> <code class="inline-code">Aether Notes</code></li>
-            <li><strong>Window Title:</strong> <code class="inline-code">Aether Notes</code></li>
-            <li><strong>Web Assets Location:</strong> <code class="inline-code">../dist</code> (maps production asset delivery layers safely relative to native outputs)</li>
-            <li><strong>URL of Dev Server:</strong> <code class="inline-code">http://localhost:5173</code></li>
-            <li><strong>Frontend Dev Command:</strong> <code class="inline-code">bun run dev</code></li>
-            <li><strong>Frontend Build Command:</strong> <code class="inline-code">bun run build</code></li>
+            <li><strong>macOS:</strong> <code class="inline-code">.app</code> bundle + <code class="inline-code">.dmg</code> disk image</li>
+            <li><strong>Windows:</strong> <code class="inline-code">.exe</code> installer + <code class="inline-code">.msi</code> package</li>
+            <li><strong>Linux:</strong> <code class="inline-code">.AppImage</code> portable binary + <code class="inline-code">.deb</code> package</li>
           </ul>
+        </section>
 
-          <h3 class="doc-h3">Step 3.2: Native Configuration of vite.config.ts</h3>
-          <p class="doc-p">Modify your <code class="inline-code">vite.config.ts</code> blueprint to clean out web-dependent asset pre-caching routines, adjust compilation target engines to modern webview runtimes, and prevent hanging threads during automated build-step cycles:</p>
-          <div class="doc-code-block">
-            <div class="code-header">
-              <span>vite.config.ts</span>
-              <button class="copy-btn" @click="copyText(viteConfigSnippet)">{{ copied === viteConfigSnippet ? 'Copied!' : 'Copy' }}</button>
-            </div>
-            <pre class="code-body"><code>{{ viteConfigSnippet }}</code></pre>
-          </div>
+        <hr class="doc-divider" />
 
-          <h3 class="doc-h3">Step 3.3: Configuration of Application Boundaries (tauri.conf.json)</h3>
-          <p class="doc-p">The <code class="inline-code">src-tauri/tauri.conf.json</code> file configures your core cross-platform settings, native scaling boundaries, application identifier paths, and hardware asset packaging trees:</p>
-          <div class="doc-code-block">
-            <div class="code-header">
-              <span>src-tauri/tauri.conf.json</span>
-              <button class="copy-btn" @click="copyText(tauriConfigSnippet)">{{ copied === tauriConfigSnippet ? 'Copied!' : 'Copy' }}</button>
-            </div>
-            <pre class="code-body"><code>{{ tauriConfigSnippet }}</code></pre>
-          </div>
+        <!-- CI/CD -->
+        <section id="cicd" class="doc-section">
+          <h2 class="doc-h2 font-display">CI/CD &amp; Releases</h2>
+          <p class="doc-p">Cross-platform release builds are automated via GitHub Actions. Pushing a version tag triggers the full pipeline.</p>
 
-          <h3 class="doc-h3">Step 3.4: Deprecating Web-Only PWA Modules</h3>
-          <p class="doc-p">Because your application layer now executes natively inside an isolated desktop shell interface framework, any PWA storage management utilities must be decoupled:</p>
+          <h3 class="doc-h3">5.1 Release Workflow</h3>
           <div class="doc-steps">
             <div class="step">
               <div class="step-num">1</div>
               <div>
-                <strong>Remove prompt component</strong>
-                <p>Purge the component file completely from your local development repository directory tree: <code class="inline-code">src/components/layout/PwaInstallPrompt.vue</code>.</p>
+                <strong>Update version</strong>
+                <p>Set the version in <code class="inline-code">src-tauri/tauri.conf.json</code> and <code class="inline-code">package.json</code>.</p>
               </div>
             </div>
             <div class="step">
               <div class="step-num">2</div>
               <div>
-                <strong>Remove registration routines</strong>
-                <p>Delete import instances or registration mappings processing the virtual service worker layer (<code class="inline-code">virtual:pwa-register</code>) from your main lifecycle orchestration entry points (<code class="inline-code">src/main.ts</code> or <code class="inline-code">src/components/layout/AppShell.vue</code>).</p>
+                <strong>Tag and push</strong>
+                <p>Create a git tag matching <code class="inline-code">v*</code> and push it to trigger the workflow.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <strong>Automated builds</strong>
+                <p>GitHub Actions builds on 4 runners: macOS (Apple Silicon + Intel), Windows, and Ubuntu.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div>
+                <strong>GitHub Release</strong>
+                <p>All platform binaries are automatically attached to a GitHub Release page.</p>
               </div>
             </div>
           </div>
+          <div class="doc-code-block">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="copy-btn" @click="copyText(releaseCmd)">{{ copied === releaseCmd ? 'Copied!' : 'Copy' }}</button>
+            </div>
+            <pre class="code-body"><code>{{ releaseCmd }}</code></pre>
+          </div>
+
+          <h3 class="doc-h3">5.2 Build Matrix</h3>
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Runner</th>
+                <th>Target</th>
+                <th>Output</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code class="inline-code">macos-latest</code></td>
+                <td>aarch64-apple-darwin</td>
+                <td><code class="inline-code">.dmg</code> (Apple Silicon)</td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">macos-latest</code></td>
+                <td>x86_64-apple-darwin</td>
+                <td><code class="inline-code">.dmg</code> (Intel)</td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">windows-latest</code></td>
+                <td>x86_64-pc-windows-msvc</td>
+                <td><code class="inline-code">.msi</code></td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">ubuntu-22.04</code></td>
+                <td>x86_64-unknown-linux-gnu</td>
+                <td><code class="inline-code">.AppImage</code> + <code class="inline-code">.deb</code></td>
+              </tr>
+            </tbody>
+          </table>
         </section>
 
         <hr class="doc-divider" />
 
-        <!-- OS Integrations -->
-        <section id="os-integrations" class="doc-section">
-          <h2 class="doc-h2 font-display">Advanced OS Integrations</h2>
-          <p class="doc-p">By decoupling from the browser runtime sandbox, you can extend core system functionalities by invoking low-level cross-platform plugins.</p>
-
-          <h3 class="doc-h3">4.1 Deep-Integrated OS Hotkeys (Global Shortcut Routines)</h3>
-          <p class="doc-p">Instead of listening for event interactions exclusively when focus is maintained within your active window area, you can capture macro hotkeys system-wide by binding commands to Tauri's global shortcut listeners:</p>
-          <div class="doc-code-block">
-            <div class="code-header">
-              <span>TypeScript</span>
-              <button class="copy-btn" @click="copyText(globalShortcutSnippet)">{{ copied === globalShortcutSnippet ? 'Copied!' : 'Copy' }}</button>
-            </div>
-            <pre class="code-body"><code>{{ globalShortcutSnippet }}</code></pre>
-          </div>
-        </section>
-
-        <hr class="doc-divider" />
-
-        <!-- Development & Build Pipeline -->
-        <section id="dev-pipeline" class="doc-section">
-          <h2 class="doc-h2 font-display">Development & Build Pipeline</h2>
-          <p class="doc-p">Execute these commands to build and run your native desktop application packages.</p>
-
-          <h3 class="doc-h3">5.1 Run Local Application Development Sandbox</h3>
-          <p class="doc-p">Launches your local live-reloaded dev environment side-by-side with a localized native debugging window frame layer to process desktop diagnostics:</p>
-          <div class="doc-code-block">
-            <div class="code-header">
-              <span>Terminal</span>
-              <button class="copy-btn" @click="copyText('bun tauri dev')">{{ copied === 'bun tauri dev' ? 'Copied!' : 'Copy' }}</button>
-            </div>
-            <pre class="code-body"><code>bun tauri dev</code></pre>
-          </div>
-
-          <h3 class="doc-h3">5.2 Build Platform-Hardened Distribution Installers</h3>
-          <p class="doc-p">Executes your full client-side minification assets pipeline, packages code into secure bundles, and builds optimized setup binaries for distribution:</p>
-          <div class="doc-code-block">
-            <div class="code-header">
-              <span>Terminal</span>
-              <button class="copy-btn" @click="copyText('bun tauri build')">{{ copied === 'bun tauri build' ? 'Copied!' : 'Copy' }}</button>
-            </div>
-            <pre class="code-body"><code>bun tauri build</code></pre>
-          </div>
-
-          <h3 class="doc-h3">5.3 Automated Release Artifact Map</h3>
-          <p class="doc-p">Upon successful compilation, your production setup files and distribution payloads are generated automatically within the release path directory (<code class="inline-code">src-tauri/target/release/bundle/</code>):</p>
-          <ul class="doc-list">
-            <li><strong>Windows Compilations:</strong> Generates fully optimized <code class="inline-code">.exe</code> runtime configuration frameworks alongside modular system <code class="inline-code">.msi</code> install packages.</li>
-            <li><strong>macOS Compilations:</strong> Provisioned as compiled application volumes (<code class="inline-code">.app</code>) alongside mountable disk image arrays (<code class="inline-code">.dmg</code>).</li>
-            <li><strong>Linux Compilations:</strong> Packaged into portable application executables (<code class="inline-code">.AppImage</code>) alongside platform-native Debian package containers (<code class="inline-code">.deb</code>).</li>
-          </ul>
+        <!-- Key Files -->
+        <section id="key-files" class="doc-section">
+          <h2 class="doc-h2 font-display">Key Files Reference</h2>
+          <p class="doc-p">Quick reference to the most important files in the codebase.</p>
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code class="inline-code">src/lib/storage.ts</code></td>
+                <td>StorageLayer interface, Tauri FS and IndexedDB implementations</td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">src/stores/notes.ts</code></td>
+                <td>Note CRUD, auto-save, encryption, and concurrency control</td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">src/stores/folders.ts</code></td>
+                <td>Folder hierarchy, drag-and-drop reordering</td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">src/lib/crypto.ts</code></td>
+                <td>AES-256-GCM encryption, PBKDF2 key derivation</td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">src/components/editor/NoteEditor.vue</code></td>
+                <td>Tiptap editor, outline, slash commands, bubble menu</td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">src-tauri/tauri.conf.json</code></td>
+                <td>App name, version, window config, build commands</td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">src-tauri/capabilities/default.json</code></td>
+                <td>Filesystem permission scopes</td>
+              </tr>
+              <tr>
+                <td><code class="inline-code">.github/workflows/release.yml</code></td>
+                <td>Cross-platform CI/CD release pipeline</td>
+              </tr>
+            </tbody>
+          </table>
         </section>
 
       </main>
@@ -318,138 +797,98 @@ function copyText(text: string) {
 }
 
 // Snippet contents
-const viteConfigSnippet = `/// <reference types="vitest" />
-import { defineConfig } from 'vitest/config';
-import vue from '@vitejs/plugin-vue';
-import path from 'path';
+const frontmatterSnippet = `---
+id: abc123
+folder: work
+isPinned: false
+isFavorite: true
+isTrashed: false
+createdAt: 1717756800000
+updatedAt: 1717843200000
+tags: ["project", "ideas"]
+---
+# My Note Title
 
-export default defineConfig(({ command }) => {
-  const plugins = [vue()];
+This is the body of the note, written in standard Markdown.
 
-  // Ensures strict process termination under Bun compilation boundaries
-  if (command === "build") {
-    plugins.push({
-      name: "force-exit",
-      closeBundle() {
-        const bun = (globalThis as any).Bun;
-        if (bun) {
-          bun.exit(0);
-        } else {
-          process.exit(0);
-        }
-      },
-    });
-  }
+- Supports **bold**, *italic*, and \`inline code\`
+- Fully portable — edit with any text editor`;
 
-  return {
-    plugins,
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, './src'),
-      },
-    },
-    clearScreen: false,
-    server: {
-      port: 5173,
-      strictPort: true,
-      host: true,
-    },
-    envPrefix: ['VITE_', 'TAURI_ENV_'],
-    build: {
-      target: process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari15',
-      minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
-      sourcemap: !!process.env.TAURI_ENV_DEBUG,
-      chunkSizeWarningLimit: 1000,
-    },
-    test: {
-      environment: 'happy-dom',
-      globals: true,
-      threads: false,
-    },
-  };
-});`;
-
-const tauriConfigSnippet = `{
-  "productName": "Aether Notes",
-  "version": "1.0.0",
-  "identifier": "com.aethernotes.app",
-  "bundle": {
-    "active": true,
-    "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
-  },
-  "app": {
-    "windows": [
-      {
-        "title": "Aether Notes",
-        "width": 1024,
-        "height": 768,
-        "minWidth": 800,
-        "minHeight": 600,
-        "resizable": true,
-        "decorations": true,
-        "fullscreen": false
-      }
-    ],
-    "security": {
-      "csp": null
-    }
-  },
-  "build": {
-    "beforeDevCommand": "bun run dev",
-    "beforeBuildCommand": "bun run build",
-    "devUrl": "http://localhost:5173",
-    "distDir": "../dist"
-  }
+const capabilitiesSnippet = `{
+  "identifier": "fs:scope",
+  "allow": [
+    { "path": "$DOCUMENT/Aether Notes" },
+    { "path": "$DOCUMENT/Aether Notes/**" }
+  ]
 }`;
 
-const globalShortcutSnippet = `import { register } from '@tauri-apps/plugin-global-shortcut';
+const linuxDepsCmd = `sudo apt update
+sudo apt install -y libgtk-3-dev libwebkit2gtk-4.1-dev \\
+  libayatana-appindicator3-dev librsvg2-dev`;
 
-/**
- * Binds a global cross-platform keystroke sequence straight into the host system.
- * This wakes your CommandPalette.vue component up even if the app layout is obscured or minimized.
- */
-async function setupGlobalShortcut(openCommandPaletteCallback: () => void) {
-  await register('CommandOrControl+Shift+K', (event) => {
-    if (event.state === 'Pressed') {
-      openCommandPaletteCallback();
-    }
-  });
-}`;
+const setupCmd = `git clone https://github.com/joshuasarmiento/aethernotes.git
+cd aethernotes
+npm install`;
+
+const releaseCmd = `# Tag a new release
+git tag v1.0.0
+git push origin v1.0.0`;
+
 
 // Active section tracking
-const activeSection = ref('blueprint');
+const activeSection = ref('introduction');
 
 const navSections = [
   {
-    label: 'Architecture',
+    label: 'Getting Started',
     items: [
-      { id: 'blueprint', title: 'Architectural Blueprint' },
-      { id: 'prerequisites', title: 'Infrastructure Prerequisites' },
+      { id: 'introduction', title: 'Introduction' },
+      { id: 'installation', title: 'Installation & Launch' },
+      { id: 'storage-location', title: 'Storage Location' },
     ],
   },
   {
-    label: 'Migration',
+    label: 'Features',
     items: [
-      { id: 'migration-steps', title: 'Step-by-Step Implementation' },
+      { id: 'rich-editor', title: 'Markdown Editor' },
+      { id: 'vault-security', title: 'Vault & Encryption' },
+      { id: 'file-org', title: 'Folders & Tags' },
+      { id: 'command-palette', title: 'Command Palette' },
     ],
   },
   {
-    label: 'Integrations',
+    label: 'How to Use',
     items: [
-      { id: 'os-integrations', title: 'Advanced OS Integrations' },
+      { id: 'create-notes', title: 'Managing Notes' },
+      { id: 'organize-notes', title: 'Organizing Notes' },
+      { id: 'encrypt-notes', title: 'Encrypting Notes' },
+      { id: 'keyboard-shortcuts', title: 'Keyboard Shortcuts' },
+    ],
+  },
+  {
+    label: 'Developer Reference',
+    items: [
+      { id: 'architecture', title: 'Architecture & Design' },
+      { id: 'security', title: 'Security Model' },
+    ],
+  },
+  {
+    label: 'Setup',
+    items: [
+      { id: 'prerequisites', title: 'Prerequisites' },
+      { id: 'dev-pipeline', title: 'Development & Build' },
     ],
   },
   {
     label: 'Deployment',
     items: [
-      { id: 'dev-pipeline', title: 'Development & Build' },
+      { id: 'cicd', title: 'CI/CD & Releases' },
+    ],
+  },
+  {
+    label: 'Reference',
+    items: [
+      { id: 'key-files', title: 'Key Files' },
     ],
   },
 ];

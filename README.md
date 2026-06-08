@@ -14,12 +14,12 @@ A minimal, secure, local-first note-taking application. Notes are stored as raw 
 
 ## Download
 
-| Platform | Link |
-|---|---|
-| macOS (Apple Silicon) | [Download .dmg](https://github.com/joshuasarmiento/aethernotes/releases/latest) |
-| macOS (Intel) | [Download .dmg](https://github.com/joshuasarmiento/aethernotes/releases/latest) |
-| Windows | [Download .msi](https://github.com/joshuasarmiento/aethernotes/releases/latest) |
-| Linux | [Download .AppImage](https://github.com/joshuasarmiento/aethernotes/releases/latest) |
+| Platform              | Link                                                                    |
+| -----------------------| -------------------------------------------------------------------------|
+| macOS (Apple Silicon) | [Download .dmg](https://github.com/fujiDevv/aethernotes/releases/)      |
+| macOS (Intel)         | [Download .dmg](https://github.com/fujiDevv/aethernotes/releases/)      |
+| Windows               | [Download .msi](https://github.com/fujiDevv/aethernotes/releases/)      |
+| Linux                 | [Download .AppImage](https://github.com/fujiDevv/aethernotes/releases/) |
 
 Or try the [web demo](https://aethernotes.vercel.app) — runs entirely in-browser with IndexedDB storage.
 
